@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Geonames 选择器（国家/地区 → 省/州）</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <h1>国家/地区 — 省/州选择器</h1>
+
+    <section class="controls card">
+      <div class="row">
+        <label for="country">国家/地区</label>
+        <select id="country">
+          <option value="">正在加载国家/地区…</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="admin1">省 / 州</label>
+        <select id="admin1">
+          <option value="">请选择国家/地区后加载</option>
+        </select>
+        <button id="clear-selection" class="btn ghost" type="button">清除</button>
+      </div>
+
+      <p id="status" class="status"></p>
+    </section>
+
+    <section id="timezone-card" class="timezone-card card" aria-live="polite">
+      <div class="tz-header">时区信息</div>
+      <div id="timezone" class="tz-content">未选择省/州</div>
+    </section>
+
+    <p class="note">数据来自 Geonames，使用已注册用户名。</p>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
