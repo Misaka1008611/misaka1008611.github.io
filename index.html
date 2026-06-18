@@ -1,0 +1,1229 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+		<title>玉溪智慧水务 · 监测设备部署点位图</title>
+		<link rel="stylesheet" href="ol/ol.css" />
+		<link rel="stylesheet" href="sol/sol.min.css" />
+		<style>
+			:root {
+				--bg: #1a1d23;
+				--panel-bg: rgba(22, 24, 30, 0.92);
+				--panel-border: rgba(255, 255, 255, 0.08);
+				--text: #e8e8ed;
+				--text-secondary: #9ca3b0;
+				--text-muted: #6b7280;
+				--accent: #60a5fa;
+				--accent-glow: rgba(96, 165, 250, 0.25);
+				--danger: #f87171;
+				--success: #4ade80;
+				--warning: #fbbf24;
+				--radius: 12px;
+				--radius-sm: 8px;
+				--blur: blur(16px);
+				--shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--panel-border);
+				--transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+				font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+				background: var(--bg);
+				overflow: hidden;
+			}
+			#mapContainer {
+				width: 100%;
+				height: 100%;
+			}
+
+			/* ---- Title Bar ---- */
+			.title-bar {
+				position: absolute;
+				top: 16px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 100;
+				background: var(--panel-bg);
+				backdrop-filter: var(--blur);
+				-webkit-backdrop-filter: var(--blur);
+				color: #fff;
+				padding: 10px 32px;
+				border-radius: 32px;
+				font-size: 16px;
+				font-weight: 600;
+				letter-spacing: 1.5px;
+				box-shadow: var(--shadow);
+				pointer-events: none;
+				white-space: nowrap;
+				border: 1px solid var(--panel-border);
+			}
+			.title-bar .dot {
+				display: inline-block;
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background: var(--success);
+				margin-right: 8px;
+				box-shadow: 0 0 8px var(--success);
+				animation: pulse-dot 2s ease-in-out infinite;
+			}
+			@keyframes pulse-dot {
+				0%,
+				100% {
+					box-shadow: 0 0 4px var(--success);
+				}
+				50% {
+					box-shadow:
+						0 0 14px var(--success),
+						0 0 24px rgba(74, 222, 128, 0.4);
+				}
+			}
+			.title-bar .sub {
+				font-size: 11px;
+				font-weight: 400;
+				letter-spacing: 0;
+				color: var(--text-secondary);
+				display: block;
+				text-align: center;
+				margin-top: 2px;
+			}
+
+			/* ---- Layer Control Panel ---- */
+			.layer-panel {
+				position: absolute;
+				top: 110px;
+				right: 16px;
+				z-index: 100;
+				background: var(--panel-bg);
+				backdrop-filter: var(--blur);
+				-webkit-backdrop-filter: var(--blur);
+				color: var(--text);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				width: 268px;
+				font-size: 13px;
+				overflow: hidden;
+				border: 1px solid var(--panel-border);
+				transition: box-shadow var(--transition);
+			}
+			.layer-panel:hover {
+				box-shadow:
+					0 12px 40px rgba(0, 0, 0, 0.55),
+					0 0 0 1px rgba(255, 255, 255, 0.13);
+			}
+			.layer-panel-header {
+				padding: 13px 18px;
+				font-weight: 700;
+				font-size: 13px;
+				letter-spacing: 0.5px;
+				cursor: pointer;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				user-select: none;
+				color: #fff;
+				transition: background var(--transition);
+			}
+			.layer-panel-header:hover {
+				background: rgba(255, 255, 255, 0.03);
+			}
+			.layer-panel-header .icon-text {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.layer-panel-header .arrow {
+				font-size: 10px;
+				color: var(--text-muted);
+				transition: transform 0.3s;
+			}
+			.layer-panel.collapsed .arrow {
+				transform: rotate(-90deg);
+			}
+			.layer-panel.collapsed .layer-panel-body {
+				display: none;
+			}
+			.layer-panel-body {
+				max-height: calc(100vh - 240px);
+				overflow-y: auto;
+				scrollbar-width: thin;
+				scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+			}
+
+			.section-label {
+				padding: 10px 18px 4px;
+				font-size: 10px;
+				color: var(--text-muted);
+				text-transform: uppercase;
+				letter-spacing: 1.5px;
+				font-weight: 700;
+			}
+			.divider {
+				border: none;
+				border-top: 1px solid rgba(255, 255, 255, 0.06);
+				margin: 6px 14px;
+			}
+			.basemap-row {
+				padding: 6px 14px 10px;
+				display: flex;
+				gap: 8px;
+			}
+			.basemap-btn {
+				flex: 1;
+				padding: 9px 6px;
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				border-radius: 20px;
+				background: transparent;
+				color: var(--text-secondary);
+				font-size: 12px;
+				cursor: pointer;
+				text-align: center;
+				transition: all var(--transition);
+				font-family: inherit;
+				position: relative;
+				overflow: hidden;
+			}
+			.basemap-btn:hover {
+				border-color: rgba(255, 255, 255, 0.3);
+				color: #fff;
+			}
+			.basemap-btn.active {
+				background: var(--accent);
+				color: #0f172a;
+				border-color: var(--accent);
+				font-weight: 700;
+				box-shadow: 0 0 16px var(--accent-glow);
+			}
+
+			.layer-item {
+				display: flex;
+				align-items: center;
+				padding: 7px 18px;
+				cursor: pointer;
+				transition: background 0.12s;
+				user-select: none;
+			}
+			.layer-item:hover {
+				background: rgba(255, 255, 255, 0.04);
+			}
+			.layer-item .dot-wrap {
+				position: relative;
+				width: 14px;
+				height: 14px;
+				margin-right: 10px;
+				flex-shrink: 0;
+			}
+			.layer-item .color-dot {
+				width: 12px;
+				height: 12px;
+				border-radius: 50%;
+				position: absolute;
+				top: 1px;
+				left: 1px;
+				border: 2px solid rgba(255, 255, 255, 0.25);
+				transition: all var(--transition);
+			}
+			.layer-item .glow-ring {
+				width: 14px;
+				height: 14px;
+				border-radius: 50%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				opacity: 0;
+				transition: opacity var(--transition);
+			}
+			.layer-item:not(.off):hover .glow-ring {
+				opacity: 0.5;
+			}
+			.layer-item.off .color-dot {
+				background: #3a3a44 !important;
+				border-color: #3a3a44;
+			}
+			.layer-item.off .glow-ring {
+				opacity: 0 !important;
+			}
+			.layer-item .label {
+				flex: 1;
+				font-size: 12.5px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				transition: color var(--transition);
+			}
+			.layer-item .count {
+				font-size: 11px;
+				color: var(--text-muted);
+				margin-left: 8px;
+				flex-shrink: 0;
+				font-variant-numeric: tabular-nums;
+			}
+			.layer-item.off .label {
+				color: #5a5a66;
+			}
+			.layer-item.off .count {
+				color: #4a4a55;
+			}
+
+			.toggle-row {
+				display: flex;
+				gap: 6px;
+				padding: 4px 18px 8px;
+			}
+			.toggle-btn {
+				flex: 1;
+				padding: 5px 8px;
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				border-radius: 14px;
+				background: transparent;
+				color: var(--text-secondary);
+				font-size: 11px;
+				cursor: pointer;
+				text-align: center;
+				transition: all var(--transition);
+				font-family: inherit;
+			}
+			.toggle-btn:hover {
+				border-color: rgba(255, 255, 255, 0.3);
+				color: #fff;
+			}
+
+			/* ---- Custom Tooltip (mouseMoveCall) ---- */
+			.custom-tooltip {
+				position: absolute;
+				z-index: 200;
+				pointer-events: none;
+				opacity: 0;
+				transform: translate(-50%, calc(-100% - 18px));
+				transition: opacity 0.15s ease;
+				background: rgba(15, 15, 22, 0.94);
+				backdrop-filter: blur(12px);
+				-webkit-backdrop-filter: blur(12px);
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				border-radius: var(--radius-sm);
+				padding: 12px 16px;
+				min-width: 200px;
+				max-width: 300px;
+				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+			}
+			.custom-tooltip.visible {
+				opacity: 1;
+			}
+			.custom-tooltip::after {
+				content: '';
+				position: absolute;
+				bottom: -6px;
+				left: 50%;
+				transform: translateX(-50%) rotate(45deg);
+				width: 10px;
+				height: 10px;
+				background: rgba(15, 15, 22, 0.94);
+				border-right: 1px solid rgba(255, 255, 255, 0.12);
+				border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+			}
+			.custom-tooltip .tt-type {
+				font-size: 10px;
+				letter-spacing: 1.5px;
+				color: var(--accent);
+				font-weight: 700;
+				margin-bottom: 4px;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.custom-tooltip .tt-type .tt-dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				display: inline-block;
+			}
+			.custom-tooltip .tt-name {
+				font-size: 13px;
+				font-weight: 700;
+				color: #fff;
+				margin-bottom: 6px;
+				line-height: 1.3;
+			}
+			.custom-tooltip .tt-row {
+				display: flex;
+				gap: 6px;
+				font-size: 11px;
+				color: var(--text-secondary);
+				margin: 2px 0;
+				line-height: 1.4;
+			}
+			.custom-tooltip .tt-row .tt-key {
+				color: var(--text-muted);
+				flex-shrink: 0;
+			}
+			.custom-tooltip .tt-row .tt-val {
+				color: #cbd5e1;
+			}
+
+			/* ---- Legend ---- */
+			.legend-popup {
+				position: absolute;
+				bottom: 56px;
+				right: 16px;
+				z-index: 100;
+				background: var(--panel-bg);
+				backdrop-filter: var(--blur);
+				-webkit-backdrop-filter: var(--blur);
+				color: var(--text);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				padding: 14px 18px;
+				font-size: 12px;
+				display: none;
+				border: 1px solid var(--panel-border);
+				min-width: 200px;
+			}
+			.legend-popup.show {
+				display: block;
+				animation: fadeUp 0.2s ease;
+			}
+			@keyframes fadeUp {
+				from {
+					opacity: 0;
+					transform: translateY(8px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+			.legend-popup .legend-title {
+				font-size: 10px;
+				letter-spacing: 1.5px;
+				color: var(--text-muted);
+				margin-bottom: 8px;
+				font-weight: 700;
+			}
+			.legend-row {
+				display: flex;
+				align-items: center;
+				margin: 5px 0;
+				gap: 8px;
+			}
+			.legend-dot {
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				flex-shrink: 0;
+			}
+			.legend-count {
+				color: var(--text-muted);
+				font-size: 11px;
+				margin-left: auto;
+			}
+
+			.legend-btn {
+				position: absolute;
+				bottom: 16px;
+				right: 16px;
+				z-index: 100;
+				background: var(--panel-bg);
+				backdrop-filter: var(--blur);
+				-webkit-backdrop-filter: var(--blur);
+				color: #fff;
+				border: 1px solid var(--panel-border);
+				border-radius: 24px;
+				padding: 9px 18px;
+				font-size: 12px;
+				cursor: pointer;
+				box-shadow: var(--shadow);
+				font-family: inherit;
+				transition: all var(--transition);
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.legend-btn:hover {
+				border-color: rgba(255, 255, 255, 0.3);
+				box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+			}
+
+			/* ---- Pick Coordinate Button ---- */
+			.pick-btn {
+				position: absolute;
+				bottom: 16px;
+				right: 16px;
+				z-index: 100;
+				background: var(--panel-bg);
+				backdrop-filter: var(--blur);
+				-webkit-backdrop-filter: var(--blur);
+				color: #fff;
+				border: 1px solid var(--panel-border);
+				border-radius: 24px;
+				padding: 9px 18px;
+				font-size: 12px;
+				cursor: pointer;
+				box-shadow: var(--shadow);
+				font-family: inherit;
+				transition: all var(--transition);
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.pick-btn:hover {
+				border-color: rgba(255, 255, 255, 0.3);
+				box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+			}
+			.pick-btn.active {
+				background: var(--accent);
+				color: #0f172a;
+				border-color: var(--accent);
+				font-weight: 700;
+				box-shadow: 0 0 20px var(--accent-glow);
+				animation: pulse-pick 1.8s ease-in-out infinite;
+			}
+			@keyframes pulse-pick {
+				0%, 100% { box-shadow: 0 0 16px var(--accent-glow); }
+				50% { box-shadow: 0 0 32px rgba(96, 165, 250, 0.5), 0 0 48px rgba(96, 165, 250, 0.2); }
+			}
+
+			/* ---- Pick Mode Indicator Bar ---- */
+			.pick-indicator {
+				position: absolute;
+				bottom: 80px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 200;
+				background: rgba(15, 15, 22, 0.92);
+				backdrop-filter: blur(12px);
+				-webkit-backdrop-filter: blur(12px);
+				border: 1px solid var(--accent);
+				border-radius: 24px;
+				padding: 10px 24px;
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				color: #fff;
+				font-size: 13px;
+				font-family: inherit;
+				box-shadow: 0 0 24px var(--accent-glow), 0 8px 32px rgba(0, 0, 0, 0.5);
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.2s ease;
+				white-space: nowrap;
+			}
+			.pick-indicator.active {
+				opacity: 1;
+			}
+			.pick-indicator .pick-label {
+				color: var(--accent);
+				font-size: 18px;
+			}
+			.pick-indicator .pick-coords {
+				font-variant-numeric: tabular-nums;
+				letter-spacing: 0.5px;
+				color: #e2e8f0;
+			}
+			.pick-indicator .pick-hint {
+				font-size: 10px;
+				color: var(--text-muted);
+				margin-left: 8px;
+				padding-left: 10px;
+				border-left: 1px solid rgba(255, 255, 255, 0.12);
+			}
+
+			/* ---- Toast Notification ---- */
+			.toast {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%) scale(0.9);
+				z-index: 300;
+				background: var(--success);
+				color: #0f172a;
+				font-weight: 700;
+				font-size: 14px;
+				padding: 10px 24px;
+				border-radius: 24px;
+				box-shadow: 0 4px 20px rgba(74, 222, 128, 0.4);
+				opacity: 0;
+				pointer-events: none;
+				transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+				font-family: inherit;
+			}
+			.toast.show {
+				opacity: 1;
+				transform: translate(-50%, -50%) scale(1);
+			}
+
+			@media (max-width: 640px) {
+				.layer-panel {
+					width: 230px;
+					right: 6px;
+					top: 90px;
+					font-size: 12px;
+					border-radius: var(--radius-sm);
+				}
+				.title-bar {
+					font-size: 13px;
+					padding: 8px 18px;
+					top: 8px;
+					border-radius: 20px;
+				}
+				.custom-tooltip {
+					max-width: 240px;
+					padding: 10px 14px;
+				}
+				.legend-btn {
+					bottom: 8px;
+					right: 8px;
+					padding: 7px 14px;
+					font-size: 11px;
+				}
+				.pick-btn {
+					bottom: 8px;
+					right: 8px;
+					padding: 7px 14px;
+					font-size: 11px;
+				}
+				.pick-indicator {
+					bottom: 56px;
+					font-size: 11px;
+					padding: 8px 16px;
+				}
+				.legend-popup {
+					bottom: 46px;
+					right: 8px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="mapContainer"></div>
+
+		<!-- Title Bar -->
+		<div class="title-bar">
+			<span class="dot"></span>
+			玉溪智慧水务 · 监测设备部署点位
+			<span class="sub">WGS84 坐标系 &nbsp;|&nbsp; 9 种设备类型 &nbsp;|&nbsp; 共 110 个点位</span>
+		</div>
+
+		<!-- Layer Control Panel -->
+		<div class="layer-panel" id="layerPanel">
+			<div class="layer-panel-header" id="panelToggle">
+				<span class="icon-text">📋 图层控制</span>
+				<span class="arrow">▼</span>
+			</div>
+			<div class="layer-panel-body">
+				<div class="section-label">🗺 底图切换</div>
+				<div class="basemap-row" id="basemapGroup">
+					<button class="basemap-btn active" data-map="vec">矢量图</button>
+					<button class="basemap-btn" data-map="img">影像图</button>
+				</div>
+				<hr class="divider" />
+				<div class="section-label">🏛 行政区划边界</div>
+				<div id="boundaryList"></div>
+				<hr class="divider" />
+				<div class="section-label">📍 设备点位图层 (9)</div>
+				<div class="toggle-row">
+					<button class="toggle-btn" id="btnSelectAll">✅ 全选</button>
+					<button class="toggle-btn" id="btnDeselectAll">❌ 全不选</button>
+				</div>
+				<div id="layerList"></div>
+			</div>
+		</div>
+
+		<!-- Legend -->
+		<!-- <button class="legend-btn" id="legendToggle">📖 图例</button>
+		<div class="legend-popup" id="legendPopup">
+			<div class="legend-title">设备类型图例</div>
+		</div> -->
+
+		<!-- Pick Coordinate Button -->
+		<button class="pick-btn" id="pickCoordBtn" title="拾取经纬度">📍 拾取坐标</button>
+
+		<!-- Pick Mode Indicator Bar -->
+		<div class="pick-indicator" id="pickIndicator">
+			<span class="pick-label">✚</span>
+			<span class="pick-coords" id="pickCoords">移动鼠标定位，左键点击复制经纬度</span>
+			<span class="pick-hint">Esc 取消</span>
+		</div>
+
+		<!-- Toast Notification -->
+		<div class="toast" id="toast"></div>
+
+		<!-- Custom Tooltip -->
+		<div class="custom-tooltip" id="customTooltip"></div>
+
+		<!-- Libraries -->
+		<script src="ol/ol.js"></script>
+		<script src="sol/sol.min.js"></script>
+		<script src="web_data/point_data.js"></script>
+		<script src="web_data/hongta_boundary.js"></script>
+
+		<script>
+			;(function () {
+				// ================================================================
+				//  Configuration
+				// ================================================================
+
+				/** Color palette for each device type — bold, saturated, opaque */
+				var TYPE_COLORS = {
+					管网压力: { fill: '#e53e3e', glow: 'rgba(229, 62, 62,0.55)' },
+					管网水质: { fill: '#0ea88b', glow: 'rgba( 14,168,139,0.55)' },
+					视频监控: { fill: '#d69e00', glow: 'rgba(214,158,  0,0.55)' },
+					水质监测: { fill: '#2d8a42', glow: 'rgba( 45,138, 66,0.55)' },
+					管网视频: { fill: '#d97706', glow: 'rgba(217,119,  6,0.55)' },
+					DMA分区: { fill: '#0d8ab5', glow: 'rgba( 13,138,181,0.55)' },
+					智能消防栓: { fill: '#c53030', glow: 'rgba(197, 48, 48,0.55)' },
+					漏损探测: { fill: '#7c3aed', glow: 'rgba(124, 58,237,0.55)' },
+					大用户表: { fill: '#0f766e', glow: 'rgba( 15,118,110,0.55)' },
+				}
+
+				/** Fallback color cycle */
+				var FALLBACK_COLORS = ['#e53e3e', '#0ea88b', '#d69e00', '#2d8a42', '#d97706', '#0d8ab5', '#c53030', '#7c3aed', '#0f766e']
+
+				// ================================================================
+				//  Data preparation
+				// ================================================================
+
+				var typeNames = Object.keys(pointData).sort()
+				var allLayers = {} // typeName -> SOL layer instance
+				var layerVisible = {} // typeName -> boolean
+
+				// Compute bounding box from all points
+				var allLons = [],
+					allLats = []
+				typeNames.forEach(function (typeName) {
+					pointData[typeName].forEach(function (rec) {
+						allLons.push(rec.Lon)
+						allLats.push(rec.Lat)
+					})
+				})
+
+				var centerLon =
+					allLons.reduce(function (a, b) {
+						return a + b
+					}, 0) / allLons.length
+				var centerLat =
+					allLats.reduce(function (a, b) {
+						return a + b
+					}, 0) / allLats.length
+				var minLon = Math.min.apply(null, allLons)
+				var maxLon = Math.max.apply(null, allLons)
+				var minLat = Math.min.apply(null, allLats)
+				var maxLat = Math.max.apply(null, allLats)
+
+				// ================================================================
+				//  Custom Tooltip
+				// ================================================================
+
+				var tooltipEl = document.getElementById('customTooltip')
+				var tooltipTimer = null
+
+				/**
+				 * Show tooltip for a feature at the given event position.
+				 * SOL stores the original data as a JSON string in feature.get("data").
+				 */
+				function showTooltip(feature, evt) {
+					var dataStr = feature.get('data')
+					var props
+					try {
+						props = JSON.parse(dataStr)
+					} catch (e) {
+						props = {}
+					}
+					var typeName = props.Type || ''
+					var colors = TYPE_COLORS[typeName]
+					var dotColor = colors ? colors.fill : '#888'
+
+					var html = ''
+					html += "<div class='tt-type'>"
+					html += "<span class='tt-dot' style='background:" + dotColor + "'></span>"
+					html += typeName + ' &nbsp;·&nbsp; #' + props.ID
+					html += '</div>'
+					html += "<div class='tt-name'>" + (props.Name || '') + '</div>'
+					if (props.Dept) {
+						html += "<div class='tt-row'><span class='tt-key'>管理所</span>"
+						html += "<span class='tt-val'>" + props.Dept + '</span></div>'
+					}
+					if (props.Location) {
+						html += "<div class='tt-row'><span class='tt-key'>位置</span>"
+						html += "<span class='tt-val'>" + props.Location + '</span></div>'
+					}
+					html += "<div class='tt-row'><span class='tt-key'>通讯</span>"
+					html += "<span class='tt-val'>" + (props.Comm || '') + '</span></div>'
+					html += "<div class='tt-row'><span class='tt-key'>供电</span>"
+					html += "<span class='tt-val'>" + (props.Power || '') + '</span></div>'
+					html += "<div class='tt-row'><span class='tt-key'>坐标</span>"
+					html += "<span class='tt-val'>" + props.Lon.toFixed(5) + ', ' + props.Lat.toFixed(5) + '</span></div>'
+
+					tooltipEl.innerHTML = html
+					tooltipEl.classList.add('visible')
+					tooltipEl.style.left = evt.pixel[0] + 'px'
+					tooltipEl.style.top = evt.pixel[1] + 'px'
+					clearTimeout(tooltipTimer)
+				}
+
+				/** Hide tooltip with a short delay to avoid flicker */
+				function hideTooltip() {
+					tooltipTimer = setTimeout(function () {
+						tooltipEl.classList.remove('visible')
+					}, 80)
+				}
+
+				// ================================================================
+				//  Style Function (styleFn) for SOL SimplePointFeatureLayer
+				// ================================================================
+
+				/**
+				 * Called by SOL for each feature during rendering.
+				 * Returns an ol.style.Style with Circle + Text.
+				 * @param {ol.Feature} feature
+				 * @returns {ol.style.Style}
+				 */
+				function makePointStyle(feature) {
+					var dataStr = feature.get('data')
+					var props
+					try {
+						props = JSON.parse(dataStr)
+					} catch (e) {
+						props = {}
+					}
+					var typeName = props.Type || ''
+					var colors = TYPE_COLORS[typeName]
+					var fillColor = colors ? colors.fill : '#888'
+
+					return new ol.style.Style({
+						image: new ol.style.Circle({
+							radius: 7,
+							declutterMode: 'obstacle',
+							fill: new ol.style.Fill({ color: fillColor }),
+							stroke: new ol.style.Stroke({
+								color: '#ffffff',
+								width: 3,
+							}),
+						}),
+						text: new ol.style.Text({
+							text: props.Name || '',
+							font: "bold 12px 'Microsoft YaHei','PingFang SC',sans-serif",
+							fill: new ol.style.Fill({ color: '#1f2937' }),
+							stroke: new ol.style.Stroke({
+								color: '#ffffff',
+								width: 2.5,
+							}),
+							backgroundFill: new ol.style.Fill({
+								color: 'rgba(255,255,255,0.85)',
+							}),
+							backgroundStroke: new ol.style.Stroke({
+								color: 'rgba(0,0,0,0.15)',
+								width: 1.5,
+							}),
+							padding: [2, 6, 2, 6],
+							offsetY: 20,
+							textAlign: 'center',
+						}),
+					})
+				}
+
+				// ================================================================
+				//  Initialize SOL Map
+				// ================================================================
+
+				var sMap = new sol.Map({
+					containerId: 'mapContainer',
+					mapCoordKind: sol.global.mapCoordKinds.epsg4326,
+					extent: [-180, -75, 170, 75],
+					center: [centerLon, centerLat],
+					zoom: 14,
+					minZoom: 3,
+					maxZoom: 19,
+					hoverScale: 1.18,
+					// Custom tooltip via mouseMoveCall
+					mouseMoveCall: function (payload) {
+						if (payload.feature) {
+							showTooltip(payload.feature, payload.evt)
+						} else {
+							hideTooltip()
+						}
+					},
+				})
+
+				// ================================================================
+				//  Tianditu Basemaps — via SOL addTdtLayer
+				// ================================================================
+
+				var vecLyr = sMap.addTdtLayer({
+					id: 'tdt_vec',
+					mapType: sol.global.mapTypes.vec,
+					visible: true,
+					noBzLayer: true,
+				})
+				var imgLyr = sMap.addTdtLayer({
+					id: 'tdt_img',
+					mapType: sol.global.mapTypes.img,
+					visible: false,
+					noBzLayer: true,
+				})
+
+				// ================================================================
+				//  Point Layers — one per device type, using styleFn
+				// ================================================================
+
+				typeNames.forEach(function (typeName, idx) {
+					// Only need to pass the minimal required options;
+					// styleFn handles all visual styling.
+					var layer = new sol.SimplePointFeatureLayer({
+						id: 'lyr_' + typeName,
+						data: pointData[typeName],
+						dataType: sol.global.featureTypes.point,
+						sourceType: 'json',
+						dataLngName: 'Lon',
+						dataLatName: 'Lat',
+						styleFn: makePointStyle,
+						// Text column still needed by SOL to pass data.text to
+						// the feature constructor (used in setText fallback)
+						declutter: 'separate',
+						renderBuffer: 30,
+						visible: true,
+					})
+
+					sMap.addLayer(layer)
+					allLayers[typeName] = layer
+					layerVisible[typeName] = true
+				})
+
+				// ================================================================
+				//  Boundary Layer — 红塔区行政区划
+				// ================================================================
+
+				var boundarySource = new ol.source.Vector({
+					features: new ol.format.GeoJSON().readFeatures(hongtaBoundary, {
+						featureProjection: 'EPSG:4326',
+						dataProjection: 'EPSG:4326',
+					}),
+				})
+
+				var boundaryLayer = new ol.layer.Vector({
+					source: boundarySource,
+					style: new ol.style.Style({
+						fill: new ol.style.Fill({
+							color: 'rgba(96, 165, 250, 0)',
+						}),
+						stroke: new ol.style.Stroke({
+							color: '#60a5fa',
+							width: 5,
+						}),
+					}),
+					visible: true,
+				})
+                boundaryLayer.setZIndex(10)
+                boundaryLayer.set('nopointermove', true) // Disable pointermove events for this layer
+				// Insert boundary layer above basemaps but below point layers
+				sMap.map.getLayers().insertAt(2, boundaryLayer)
+				var boundaryVisible = true
+
+				// ================================================================
+				//  Build Layer Control UI
+				// ================================================================
+
+				// ---- Boundary toggle ----
+				var boundaryListEl = document.getElementById('boundaryList')
+				var boundaryItem = document.createElement('div')
+				boundaryItem.className = 'layer-item'
+				boundaryItem.innerHTML =
+					"<span class='dot-wrap'>" +
+					"<span class='glow-ring' style='box-shadow:0 0 10px rgba(96,165,250,0.5)'></span>" +
+					"<span class='color-dot' style='background:#60a5fa'></span>" +
+					'</span>' +
+					"<span class='label'>红塔区边界</span>" +
+					"<span class='count'>面</span>"
+
+				boundaryItem.addEventListener('click', function () {
+					if (boundaryVisible) {
+						boundaryLayer.setVisible(false)
+						boundaryVisible = false
+						this.classList.add('off')
+					} else {
+						boundaryLayer.setVisible(true)
+						boundaryVisible = true
+						this.classList.remove('off')
+					}
+				})
+				boundaryListEl.appendChild(boundaryItem)
+
+				// ---- Point layer items ----
+				var layerListEl = document.getElementById('layerList')
+
+				typeNames.forEach(function (typeName, idx) {
+					var colors = TYPE_COLORS[typeName]
+					var fillColor = colors ? colors.fill : FALLBACK_COLORS[idx % FALLBACK_COLORS.length]
+					var glowColor = colors ? colors.glow : 'rgba(255,255,255,0.15)'
+					var count = pointData[typeName].length
+
+					var item = document.createElement('div')
+					item.className = 'layer-item'
+					item.setAttribute('data-type', typeName)
+					item.innerHTML =
+						"<span class='dot-wrap'>" +
+						"<span class='glow-ring' style='box-shadow:0 0 10px " +
+						glowColor +
+						"'></span>" +
+						"<span class='color-dot' style='background:" +
+						fillColor +
+						"'></span>" +
+						'</span>' +
+						"<span class='label'>" +
+						typeName +
+						'</span>' +
+						"<span class='count'>" +
+						count +
+						'</span>'
+
+					item.addEventListener('click', function () {
+						var t = this.getAttribute('data-type')
+						var lyr = allLayers[t]
+						if (layerVisible[t]) {
+							lyr.hide()
+							layerVisible[t] = false
+							this.classList.add('off')
+						} else {
+							lyr.show()
+							layerVisible[t] = true
+							this.classList.remove('off')
+						}
+					})
+
+					layerListEl.appendChild(item)
+				})
+
+				// ================================================================
+				//  Select All / Deselect All
+				// ================================================================
+
+				document.getElementById('btnSelectAll').addEventListener('click', function () {
+					typeNames.forEach(function (typeName) {
+						if (!layerVisible[typeName]) {
+							allLayers[typeName].show()
+							layerVisible[typeName] = true
+							var item = layerListEl.querySelector("[data-type='" + typeName + "']")
+							if (item) item.classList.remove('off')
+						}
+					})
+				})
+
+				document.getElementById('btnDeselectAll').addEventListener('click', function () {
+					typeNames.forEach(function (typeName) {
+						if (layerVisible[typeName]) {
+							allLayers[typeName].hide()
+							layerVisible[typeName] = false
+							var item = layerListEl.querySelector("[data-type='" + typeName + "']")
+							if (item) item.classList.add('off')
+						}
+					})
+				})
+
+				// ================================================================
+				//  Build Legend
+				// ================================================================
+
+				var legendPopup = document.getElementById('legendPopup')
+				var legendBtn = document.getElementById('legendToggle')
+
+				// Only build legend if the HTML elements exist (currently commented out)
+				if (legendPopup && legendBtn) {
+					typeNames.forEach(function (typeName, idx) {
+						var colors = TYPE_COLORS[typeName]
+						var fillColor = colors ? colors.fill : FALLBACK_COLORS[idx % FALLBACK_COLORS.length]
+						var count = pointData[typeName].length
+						var row = document.createElement('div')
+						row.className = 'legend-row'
+						row.innerHTML =
+							"<span class='legend-dot' style='background:" +
+							fillColor +
+							";border:2px solid rgba(255,255,255,0.35)'></span>" +
+							'<span>' +
+							typeName +
+							'</span>' +
+							"<span class='legend-count'>" +
+							count +
+							'个</span>'
+						legendPopup.appendChild(row)
+					})
+
+					legendBtn.addEventListener('click', function (e) {
+						e.stopPropagation()
+						legendPopup.classList.toggle('show')
+					})
+					document.addEventListener('click', function (e) {
+						if (!legendPopup.contains(e.target) && e.target !== legendBtn) {
+							legendPopup.classList.remove('show')
+						}
+					})
+				}
+
+				// ================================================================
+				//  Basemap Switcher
+				// ================================================================
+
+				var currentBasemap = 'vec'
+
+				document.getElementById('basemapGroup').addEventListener('click', function (e) {
+					var btn = e.target.closest('.basemap-btn')
+					if (!btn) return
+					var type = btn.getAttribute('data-map')
+					if (type === currentBasemap) return
+
+					// Update button active states
+					this.querySelectorAll('.basemap-btn').forEach(function (b) {
+						b.classList.remove('active')
+					})
+					btn.classList.add('active')
+					currentBasemap = type
+
+					// Switch basemap visibility
+					if (type === 'vec') {
+						vecLyr.show()
+						imgLyr.hide()
+					} else if (type === 'img') {
+						vecLyr.hide()
+						imgLyr.show()
+					}
+				})
+
+				// ================================================================
+				//  Panel Collapse Toggle
+				// ================================================================
+
+				document.getElementById('panelToggle').addEventListener('click', function () {
+					document.getElementById('layerPanel').classList.toggle('collapsed')
+				})
+
+				// ================================================================
+				//  Pick Coordinate Mode
+				// ================================================================
+
+				var pickBtn = document.getElementById('pickCoordBtn')
+				var pickIndicator = document.getElementById('pickIndicator')
+				var pickCoordsEl = document.getElementById('pickCoords')
+				var toastEl = document.getElementById('toast')
+				var olMap = sMap.getMap ? sMap.getMap() : sMap.map
+				var pickActive = false
+				var pickPointerMoveKey = null
+				var pickMapClickKey = null
+				var pickKeyDownHandler = null
+				var toastTimer = null
+
+				function showToast(msg) {
+					toastEl.textContent = msg
+					toastEl.classList.add('show')
+					clearTimeout(toastTimer)
+					toastTimer = setTimeout(function () {
+						toastEl.classList.remove('show')
+					}, 1500)
+				}
+
+				function enterPickMode() {
+					pickActive = true
+					pickBtn.classList.add('active')
+					pickBtn.textContent = '✚ 拾取中…'
+					pickIndicator.classList.add('active')
+					olMap.getViewport().style.cursor = 'crosshair'
+
+					// Update coordinate display on pointer move
+					pickPointerMoveKey = olMap.on('pointermove', function (evt) {
+						if (evt.dragging) return
+						var coord = evt.coordinate
+						pickCoordsEl.textContent =
+							'经度 ' + coord[0].toFixed(6) + '  ,  纬度 ' + coord[1].toFixed(6)
+					})
+
+					// Left-click to copy and exit
+					pickMapClickKey = olMap.on('click', function (evt) {
+						var coord = evt.coordinate
+						var text = coord[0].toFixed(6) + ', ' + coord[1].toFixed(6)
+						if (navigator.clipboard && navigator.clipboard.writeText) {
+							navigator.clipboard.writeText(text).then(function () {
+								showToast('✅ 已复制: ' + text)
+							}).catch(function () {
+								fallbackCopy(text)
+							})
+						} else {
+							fallbackCopy(text)
+						}
+						exitPickMode()
+					})
+
+					// Esc key to cancel
+					pickKeyDownHandler = function (e) {
+						if (e.key === 'Escape') {
+							exitPickMode()
+						}
+					}
+					document.addEventListener('keydown', pickKeyDownHandler)
+				}
+
+				function fallbackCopy(text) {
+					var ta = document.createElement('textarea')
+					ta.value = text
+					ta.style.position = 'fixed'
+					ta.style.left = '-9999px'
+					ta.style.top = '-9999px'
+					document.body.appendChild(ta)
+					ta.focus()
+					ta.select()
+					try {
+						document.execCommand('copy')
+						showToast('✅ 已复制: ' + text)
+					} catch (e) {
+						showToast('⚠ 复制失败，请手动记录')
+					}
+					document.body.removeChild(ta)
+				}
+
+				function exitPickMode() {
+					pickActive = false
+					pickBtn.classList.remove('active')
+					pickBtn.textContent = '📍 拾取坐标'
+					pickIndicator.classList.remove('active')
+					pickCoordsEl.textContent = '移动鼠标定位，左键点击复制经纬度'
+					olMap.getViewport().style.cursor = ''
+
+					// Remove listeners
+					if (pickPointerMoveKey !== null) {
+						ol.Observable.unByKey(pickPointerMoveKey)
+						pickPointerMoveKey = null
+					}
+					if (pickMapClickKey !== null) {
+						ol.Observable.unByKey(pickMapClickKey)
+						pickMapClickKey = null
+					}
+					if (pickKeyDownHandler !== null) {
+						document.removeEventListener('keydown', pickKeyDownHandler)
+						pickKeyDownHandler = null
+					}
+				}
+
+				pickBtn.addEventListener('click', function () {
+					if (pickActive) {
+						exitPickMode()
+					} else {
+						enterPickMode()
+					}
+				})
+
+				// ================================================================
+				//  Startup Log
+				// ================================================================
+
+				console.log('%c玉溪智慧水务点位图 %c初始化完成', 'font-size:16px;font-weight:bold;', 'font-size:12px;')
+				console.log('  设备类型: ' + typeNames.length + ' | 总点位: ' + allLons.length)
+				console.log('  地图中心: [' + centerLon.toFixed(4) + ', ' + centerLat.toFixed(4) + ']')
+				console.log('  底图: 天地图 (SOL addTdtLayer) | 坐标系: EPSG:4326')
+				console.log('  点样式: SOL styleFn | 气泡: mouseMoveCall')
+			})()
+		</script>
+	</body>
+</html>
