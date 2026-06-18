@@ -1632,6 +1632,49 @@
 				sMap.map.getLayers().insertAt(2, boundaryLayer)
 				var boundaryVisible = true
 
+				// ---- Township boundary layer (乡镇面) ----
+				var townshipSource = new ol.source.Vector()
+				var townshipLayer = new ol.layer.Vector({
+					source: townshipSource,
+					style: function (feature) {
+						return new ol.style.Style({
+							fill: new ol.style.Fill({
+								color: 'rgba(167, 139, 250, 0.06)',
+							}),
+							stroke: new ol.style.Stroke({
+								color: '#a78bfa',
+								width: 2.5,
+								lineDash: [6, 3],
+							}),
+							text: new ol.style.Text({
+								text: feature.get('Name') || '',
+								font: '700 32px "Source Han Sans CN", "Microsoft YaHei", "PingFang SC", "sans-serif"',
+								fill: new ol.style.Fill({ color: '#6b6783' }),
+								stroke: new ol.style.Stroke({ color: 'rgba(255,255,255,0.8)', width: 3 }),
+							}),
+						})
+					},
+					visible: true,
+				})
+				townshipLayer.setZIndex(9)
+				townshipLayer.set('nopointermove', true)
+				sMap.map.getLayers().insertAt(2, townshipLayer)
+				var townshipVisible = true
+
+				// Load township GeoJSON asynchronously
+				fetch('web_data/乡镇面.json')
+					.then(function (res) { return res.json() })
+					.then(function (geojson) {
+						var features = new ol.format.GeoJSON().readFeatures(geojson, {
+							featureProjection: 'EPSG:4326',
+							dataProjection: 'EPSG:4326',
+						})
+						townshipSource.addFeatures(features)
+					})
+					.catch(function (err) {
+						console.warn('加载乡镇面数据失败:', err)
+					})
+
 				// ================================================================
 				//  Build Layer Control UI
 				// ================================================================
@@ -1660,6 +1703,30 @@
 					}
 				})
 				boundaryListEl.appendChild(boundaryItem)
+
+				// ---- Township toggle ----
+				var townshipItem = document.createElement('div')
+				townshipItem.className = 'layer-item'
+				townshipItem.innerHTML =
+					"<span class='dot-wrap'>" +
+					"<span class='glow-ring' style='box-shadow:0 0 10px rgba(167,139,250,0.5)'></span>" +
+					"<span class='color-dot' style='background:#a78bfa'></span>" +
+					'</span>' +
+					"<span class='label'>乡镇边界</span>" +
+					"<span class='count'>面</span>"
+
+				townshipItem.addEventListener('click', function () {
+					if (townshipVisible) {
+						townshipLayer.setVisible(false)
+						townshipVisible = false
+						this.classList.add('off')
+					} else {
+						townshipLayer.setVisible(true)
+						townshipVisible = true
+						this.classList.remove('off')
+					}
+				})
+				boundaryListEl.appendChild(townshipItem)
 
 				// ---- Point layer items ----
 				var layerListEl = document.getElementById('layerList')
@@ -2555,6 +2622,7 @@
 					var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feat, layer) {
 						if (layer === highlightLayer) return null
 						if (layer === boundaryLayer) return null
+							if (layer === townshipLayer) return null
 						if (feat.get('data')) return feat
 						return null
 					})
