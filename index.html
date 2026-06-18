@@ -485,8 +485,15 @@
 				animation: pulse-pick 1.8s ease-in-out infinite;
 			}
 			@keyframes pulse-pick {
-				0%, 100% { box-shadow: 0 0 16px var(--accent-glow); }
-				50% { box-shadow: 0 0 32px rgba(96, 165, 250, 0.5), 0 0 48px rgba(96, 165, 250, 0.2); }
+				0%,
+				100% {
+					box-shadow: 0 0 16px var(--accent-glow);
+				}
+				50% {
+					box-shadow:
+						0 0 32px rgba(96, 165, 250, 0.5),
+						0 0 48px rgba(96, 165, 250, 0.2);
+				}
 			}
 
 			/* ---- Pick Mode Indicator Bar ---- */
@@ -508,7 +515,9 @@
 				color: #fff;
 				font-size: 13px;
 				font-family: inherit;
-				box-shadow: 0 0 24px var(--accent-glow), 0 8px 32px rgba(0, 0, 0, 0.5);
+				box-shadow:
+					0 0 24px var(--accent-glow),
+					0 8px 32px rgba(0, 0, 0, 0.5);
 				opacity: 0;
 				pointer-events: none;
 				transition: opacity 0.2s ease;
@@ -558,6 +567,549 @@
 				transform: translate(-50%, -50%) scale(1);
 			}
 
+			/* ---- Drag Sub-Mode Bar ---- */
+			.drag-bar {
+				position: absolute;
+				bottom: 80px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 200;
+				background: rgba(15, 15, 22, 0.92);
+				backdrop-filter: blur(12px);
+				-webkit-backdrop-filter: blur(12px);
+				border: 1px solid var(--warning);
+				border-radius: 24px;
+				padding: 10px 24px;
+				display: none;
+				align-items: center;
+				gap: 12px;
+				color: #fff;
+				font-size: 13px;
+				font-family: inherit;
+				box-shadow:
+					0 0 24px rgba(251, 191, 36, 0.3),
+					0 8px 32px rgba(0, 0, 0, 0.5);
+				white-space: nowrap;
+			}
+			.drag-bar.visible {
+				display: flex;
+			}
+			.drag-bar .drag-label {
+				color: var(--warning);
+				font-weight: 700;
+			}
+			.drag-bar .drag-hint {
+				font-size: 10px;
+				color: var(--text-muted);
+			}
+
+			/* ---- Edit Panel (Left Side) ---- */
+			.edit-panel {
+				position: absolute;
+				top: 110px;
+				left: 16px;
+				z-index: 100;
+				background: var(--panel-bg);
+				backdrop-filter: var(--blur);
+				-webkit-backdrop-filter: var(--blur);
+				color: var(--text);
+				border-radius: var(--radius);
+				box-shadow: var(--shadow);
+				width: 320px;
+				font-size: 13px;
+				overflow: hidden;
+				border: 1px solid var(--panel-border);
+				transition: all var(--transition);
+				display: none;
+			}
+			.edit-panel.visible {
+				display: block;
+				animation: fadeUp 0.2s ease;
+			}
+			.edit-panel-header {
+				padding: 13px 18px;
+				font-weight: 700;
+				font-size: 13px;
+				letter-spacing: 0.5px;
+				cursor: pointer;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				user-select: none;
+				color: #fff;
+				transition: background var(--transition);
+			}
+			.edit-panel-header:hover {
+				background: rgba(255, 255, 255, 0.03);
+			}
+			.edit-panel-header .arrow {
+				font-size: 10px;
+				color: var(--text-muted);
+				transition: transform 0.3s;
+			}
+			.edit-panel.collapsed .arrow {
+				transform: rotate(-90deg);
+			}
+			.edit-panel.collapsed .edit-panel-body {
+				display: none;
+			}
+			.edit-panel-body {
+				max-height: calc(100vh - 280px);
+				overflow-y: auto;
+				scrollbar-width: thin;
+				scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+			}
+
+			/* ---- History Banner ---- */
+			.history-banner {
+				margin: 8px 14px;
+				padding: 10px 14px;
+				background: rgba(251, 191, 36, 0.12);
+				border: 1px solid rgba(251, 191, 36, 0.3);
+				border-radius: var(--radius-sm);
+				font-size: 12px;
+				color: var(--warning);
+				display: none;
+				align-items: center;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+			.history-banner.visible {
+				display: flex;
+			}
+			.history-banner .banner-text {
+				flex: 1;
+				min-width: 140px;
+			}
+			.history-banner .banner-btn {
+				padding: 4px 12px;
+				border: 1px solid var(--warning);
+				border-radius: 14px;
+				background: transparent;
+				color: var(--warning);
+				font-size: 11px;
+				cursor: pointer;
+				font-family: inherit;
+				transition: all var(--transition);
+				white-space: nowrap;
+			}
+			.history-banner .banner-btn:hover {
+				background: var(--warning);
+				color: #0f172a;
+			}
+
+			/* ---- Selected Point Info ---- */
+			.selected-info {
+				padding: 0 18px 12px;
+				display: none;
+			}
+			.selected-info.visible {
+				display: block;
+			}
+			.selected-info .sel-title {
+				font-size: 10px;
+				letter-spacing: 1.5px;
+				color: var(--text-muted);
+				font-weight: 700;
+				margin-bottom: 8px;
+				text-transform: uppercase;
+			}
+			.selected-info .sel-row {
+				display: flex;
+				gap: 6px;
+				font-size: 11.5px;
+				margin: 3px 0;
+				line-height: 1.5;
+			}
+			.selected-info .sel-key {
+				color: var(--text-muted);
+				flex-shrink: 0;
+				min-width: 36px;
+			}
+			.selected-info .sel-val {
+				color: #cbd5e1;
+				word-break: break-all;
+			}
+			.selected-info .sel-actions {
+				display: flex;
+				gap: 8px;
+				margin-top: 10px;
+			}
+
+			/* ---- Button Variants ---- */
+			.btn-primary {
+				padding: 7px 16px;
+				border: none;
+				border-radius: 16px;
+				background: var(--accent);
+				color: #0f172a;
+				font-size: 12px;
+				font-weight: 700;
+				cursor: pointer;
+				font-family: inherit;
+				transition: all var(--transition);
+			}
+			.btn-primary:hover {
+				box-shadow: 0 0 16px var(--accent-glow);
+				transform: translateY(-1px);
+			}
+			.btn-danger {
+				padding: 7px 16px;
+				border: none;
+				border-radius: 16px;
+				background: var(--danger);
+				color: #fff;
+				font-size: 12px;
+				font-weight: 700;
+				cursor: pointer;
+				font-family: inherit;
+				transition: all var(--transition);
+			}
+			.btn-danger:hover {
+				box-shadow: 0 0 16px rgba(248, 113, 113, 0.4);
+				transform: translateY(-1px);
+			}
+			.btn-secondary {
+				padding: 7px 16px;
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				border-radius: 16px;
+				background: transparent;
+				color: var(--text-secondary);
+				font-size: 12px;
+				cursor: pointer;
+				font-family: inherit;
+				transition: all var(--transition);
+			}
+			.btn-secondary:hover {
+				border-color: rgba(255, 255, 255, 0.3);
+				color: #fff;
+			}
+			.btn-sm {
+				padding: 3px 10px;
+				font-size: 10.5px;
+				border-radius: 12px;
+			}
+
+			/* ---- Add Point Button (in panel) ---- */
+			.edit-panel .add-point-btn {
+				display: block;
+				width: calc(100% - 28px);
+				margin: 8px 14px;
+				padding: 9px;
+				border: 1px dashed rgba(255, 255, 255, 0.2);
+				border-radius: var(--radius-sm);
+				background: transparent;
+				color: var(--text-secondary);
+				font-size: 12px;
+				cursor: pointer;
+				font-family: inherit;
+				text-align: center;
+				transition: all var(--transition);
+			}
+			.edit-panel .add-point-btn:hover {
+				border-color: var(--accent);
+				color: var(--accent);
+				background: rgba(96, 165, 250, 0.05);
+			}
+
+			/* ---- Version History ---- */
+			.version-section-label {
+				padding: 10px 18px 4px;
+				font-size: 10px;
+				color: var(--text-muted);
+				text-transform: uppercase;
+				letter-spacing: 1.5px;
+				font-weight: 700;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+			.version-item {
+				margin: 2px 8px;
+				padding: 9px 12px;
+				border-radius: var(--radius-sm);
+				cursor: pointer;
+				transition: all var(--transition);
+				border: 1px solid transparent;
+			}
+			.version-item:hover {
+				background: rgba(255, 255, 255, 0.03);
+			}
+			.version-item.active {
+				border-color: var(--accent);
+				background: rgba(96, 165, 250, 0.08);
+			}
+			.version-item.historical {
+				border-color: var(--warning);
+				background: rgba(251, 191, 36, 0.06);
+			}
+			.version-item .ver-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 3px;
+			}
+			.version-item .ver-id {
+				font-weight: 700;
+				font-size: 12px;
+				color: #fff;
+			}
+			.version-item.active .ver-id {
+				color: var(--accent);
+			}
+			.version-item .ver-time {
+				font-size: 10px;
+				color: var(--text-muted);
+				font-variant-numeric: tabular-nums;
+			}
+			.version-item .ver-desc {
+				font-size: 11.5px;
+				color: var(--text-secondary);
+				margin-bottom: 4px;
+			}
+			.version-item .ver-actions {
+				display: flex;
+				gap: 6px;
+			}
+			.version-item .ver-chip {
+				display: inline-block;
+				padding: 2px 8px;
+				border-radius: 10px;
+				font-size: 10px;
+				font-weight: 600;
+				margin-right: 4px;
+				margin-top: 2px;
+			}
+			.ver-chip.add {
+				background: rgba(74, 222, 128, 0.15);
+				color: var(--success);
+			}
+			.ver-chip.update {
+				background: rgba(96, 165, 250, 0.15);
+				color: var(--accent);
+			}
+			.ver-chip.delete {
+				background: rgba(248, 113, 113, 0.15);
+				color: var(--danger);
+			}
+			.version-empty {
+				padding: 14px 18px;
+				font-size: 12px;
+				color: var(--text-muted);
+				text-align: center;
+			}
+
+			/* ---- Modal Overlay ---- */
+			.modal-overlay {
+				position: fixed;
+				inset: 0;
+				z-index: 500;
+				background: rgba(0, 0, 0, 0.65);
+				backdrop-filter: blur(4px);
+				-webkit-backdrop-filter: blur(4px);
+				display: none;
+				align-items: center;
+				justify-content: center;
+			}
+			.modal-overlay.visible {
+				display: flex;
+				animation: fadeIn 0.2s ease;
+			}
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+			.modal-card {
+				background: var(--panel-bg);
+				backdrop-filter: var(--blur);
+				-webkit-backdrop-filter: var(--blur);
+				border: 1px solid var(--panel-border);
+				border-radius: var(--radius);
+				box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+				width: 480px;
+				max-width: 94vw;
+				max-height: 85vh;
+				overflow-y: auto;
+				padding: 0;
+				scrollbar-width: thin;
+				scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+			}
+			.modal-header {
+				padding: 16px 20px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				position: sticky;
+				top: 0;
+				background: inherit;
+				z-index: 1;
+			}
+			.modal-header .modal-title {
+				font-size: 15px;
+				font-weight: 700;
+				color: #fff;
+			}
+			.modal-close {
+				width: 28px;
+				height: 28px;
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				border-radius: 50%;
+				background: transparent;
+				color: var(--text-muted);
+				font-size: 16px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all var(--transition);
+				font-family: inherit;
+				line-height: 1;
+			}
+			.modal-close:hover {
+				border-color: rgba(255, 255, 255, 0.3);
+				color: #fff;
+			}
+			.modal-body {
+				padding: 16px 20px;
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 12px 14px;
+			}
+			.modal-body .form-group.full-width {
+				grid-column: 1 / -1;
+			}
+			.modal-footer {
+				padding: 12px 20px 16px;
+				border-top: 1px solid rgba(255, 255, 255, 0.06);
+				display: flex;
+				justify-content: flex-end;
+				gap: 10px;
+			}
+
+			/* ---- Form Elements ---- */
+			.form-group {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+			}
+			.form-label {
+				font-size: 10.5px;
+				color: var(--text-muted);
+				font-weight: 600;
+				letter-spacing: 0.5px;
+				text-transform: uppercase;
+			}
+			.form-label .required {
+				color: var(--danger);
+				margin-left: 2px;
+			}
+			.form-input,
+			.form-select,
+			.form-textarea {
+				padding: 9px 12px;
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				border-radius: var(--radius-sm);
+				background: rgba(0, 0, 0, 0.3);
+				color: #e2e8f0;
+				font-size: 13px;
+				font-family: inherit;
+				transition: border-color var(--transition);
+				outline: none;
+				width: 100%;
+				box-sizing: border-box;
+			}
+			.form-input:focus,
+			.form-select:focus,
+			.form-textarea:focus {
+				border-color: var(--accent);
+				box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+			}
+			.form-select {
+				cursor: pointer;
+				appearance: none;
+				-webkit-appearance: none;
+				background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ca3b0'/%3E%3C/svg%3E");
+				background-repeat: no-repeat;
+				background-position: right 12px center;
+				padding-right: 32px;
+			}
+			.form-textarea {
+				resize: vertical;
+				min-height: 56px;
+			}
+			.form-error {
+				font-size: 10.5px;
+				color: var(--danger);
+				display: none;
+			}
+			.form-error.visible {
+				display: block;
+			}
+
+			/* ---- Confirm Dialog ---- */
+			.confirm-overlay {
+				position: fixed;
+				inset: 0;
+				z-index: 600;
+				background: rgba(0, 0, 0, 0.7);
+				display: none;
+				align-items: center;
+				justify-content: center;
+			}
+			.confirm-overlay.visible {
+				display: flex;
+			}
+			.confirm-card {
+				background: var(--panel-bg);
+				backdrop-filter: var(--blur);
+				-webkit-backdrop-filter: var(--blur);
+				border: 1px solid var(--panel-border);
+				border-radius: var(--radius);
+				box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+				padding: 24px;
+				text-align: center;
+				max-width: 360px;
+				width: 90vw;
+			}
+			.confirm-card .confirm-icon {
+				font-size: 36px;
+				margin-bottom: 10px;
+			}
+			.confirm-card .confirm-msg {
+				font-size: 14px;
+				color: #e2e8f0;
+				margin-bottom: 16px;
+				line-height: 1.5;
+			}
+			.confirm-card .confirm-actions {
+				display: flex;
+				gap: 10px;
+				justify-content: center;
+			}
+
+			/* ---- Toast Variants ---- */
+			.toast.error {
+				background: var(--danger);
+				box-shadow: 0 4px 20px rgba(248, 113, 113, 0.4);
+			}
+
+			/* ---- Upload Version ---- */
+			.upload-version-row {
+				padding: 6px 14px 8px;
+				display: flex;
+				align-items: center;
+			}
+			.upload-version-row .btn-secondary {
+				font-size: 11px;
+				padding: 5px 12px;
+			}
+
+			/* ---- Responsive ---- */
 			@media (max-width: 640px) {
 				.layer-panel {
 					width: 230px;
@@ -596,6 +1148,20 @@
 				.legend-popup {
 					bottom: 46px;
 					right: 8px;
+				}
+				.edit-panel {
+					width: 260px;
+					left: 4px;
+					top: 90px;
+					font-size: 12px;
+					border-radius: var(--radius-sm);
+				}
+				.modal-card {
+					width: 96vw;
+					max-height: 90vh;
+				}
+				.modal-body {
+					grid-template-columns: 1fr;
 				}
 			}
 		</style>
@@ -651,11 +1217,152 @@
 			<span class="pick-hint">Esc 取消</span>
 		</div>
 
+		<!-- Drag Sub-Mode Indicator Bar -->
+		<div class="drag-bar" id="dragBar">
+			<span class="drag-label">📍 拖动点位到新位置</span>
+			<span class="drag-hint">拖动地图上的高亮圆环，完成后点击确定</span>
+			<button class="btn-primary btn-sm" id="dragConfirm">✅ 确定位置</button>
+			<button class="btn-secondary btn-sm" id="dragCancel">取消</button>
+		</div>
+
 		<!-- Toast Notification -->
 		<div class="toast" id="toast"></div>
 
 		<!-- Custom Tooltip -->
 		<div class="custom-tooltip" id="customTooltip"></div>
+
+
+		<!-- Edit Panel (Left Side) -->
+		<div class="edit-panel visible" id="editPanel">
+			<div class="edit-panel-header" id="editPanelToggle">
+				<span style="flex:1">📋 版本管理</span>
+				<button class="btn-primary btn-sm" id="btnStartEdit">✏️ 编辑</button>
+				<button class="btn-primary btn-sm" id="btnSaveSession" style="display:none;margin-right:4px" title="保存编辑">💾 保存</button>
+				<button class="btn-secondary btn-sm" id="btnDiscardSession" style="display:none;margin-right:4px" title="放弃编辑">↩ 放弃</button>
+				<span class="arrow">▼</span>
+			</div>
+			<div class="edit-panel-body">
+				<!-- History Banner -->
+				<div class="history-banner" id="historyBanner">
+					<span class="banner-text" id="bannerText">正在查看历史版本 V?</span>
+					<button class="banner-btn" id="bannerRestoreBtn">返回当前版本</button>
+				</div>
+
+				<!-- Add Point Button -->
+				<button class="add-point-btn" id="addPointBtn">➕ 手动添加点位</button>
+
+				<!-- Selected Point Info -->
+				<div class="selected-info" id="selectedInfo">
+					<div class="sel-title">📌 已选点位</div>
+					<div id="selectedDetails"></div>
+					<div class="sel-actions">
+						<button class="btn-primary btn-sm" id="btnEditPoint">✎ 编辑</button>
+						<button class="btn-secondary btn-sm" id="btnMovePoint">📍 调整位置</button>
+						<button class="btn-danger btn-sm" id="btnDeletePoint">✕ 删除</button>
+					</div>
+				</div>
+
+				<hr class="divider" />
+				<div class="version-section-label">
+					<span>🕓 版本历史</span>
+					<span style="font-size: 10px; color: var(--text-muted)" id="versionCountLabel"></span>
+				</div>
+				<div id="versionHistoryList"></div>
+					<div class="upload-version-row">
+						<input type="file" id="uploadVersionInput" accept=".js" style="display:none" />
+						<button class="btn-secondary btn-sm" id="btnUploadVersion">📤 上传版本文件</button>
+						<span style="font-size:10px;color:var(--text-muted);margin-left:8px">上传 .js 数据文件</span>
+					</div>
+			</div>
+		</div>
+
+		<!-- Modal: Add / Edit Point Form -->
+		<div class="modal-overlay" id="modalOverlay">
+			<div class="modal-card">
+				<div class="modal-header">
+					<span class="modal-title" id="modalTitle">添加点位</span>
+					<button class="modal-close" id="modalClose">✕</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label class="form-label">
+							设备类型
+							<span class="required">*</span>
+						</label>
+						<select class="form-select" id="formType"></select>
+						<span class="form-error" id="errType">请选择设备类型</span>
+					</div>
+					<div class="form-group">
+						<label class="form-label">
+							点位名称
+							<span class="required">*</span>
+						</label>
+						<input class="form-input" id="formName" placeholder="例：压力监测点-A01" />
+						<span class="form-error" id="errName">请输入点位名称</span>
+					</div>
+					<div class="form-group">
+						<label class="form-label">管理所</label>
+						<input class="form-input" id="formDept" placeholder="例：北市区供水管理所" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">位置描述</label>
+						<input class="form-input" id="formLocation" placeholder="例：玉江大道与太极路交叉口" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">
+							经度 (Lon)
+							<span class="required">*</span>
+						</label>
+						<input class="form-input" id="formLon" type="number" step="0.000001" placeholder="102.xxxxxx" />
+						<span class="form-error" id="errLon">请输入有效经度</span>
+					</div>
+					<div class="form-group">
+						<label class="form-label">
+							纬度 (Lat)
+							<span class="required">*</span>
+						</label>
+						<input class="form-input" id="formLat" type="number" step="0.000001" placeholder="24.xxxxxx" />
+						<span class="form-error" id="errLat">请输入有效纬度</span>
+					</div>
+					<div class="form-group">
+						<label class="form-label">数量</label>
+						<input class="form-input" id="formQty" type="number" min="1" value="1" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">供电方式</label>
+						<input class="form-input" id="formPower" placeholder="例：锂电池；（≥6年）" />
+					</div>
+					<div class="form-group">
+						<label class="form-label">通讯方式</label>
+						<input class="form-input" id="formComm" placeholder="例：GPRS" />
+					</div>
+					<div class="form-group full-width">
+						<label class="form-label">安装条件</label>
+						<input class="form-input" id="formCond" placeholder="例：需开挖路面；安装管段式" />
+					</div>
+					<div class="form-group full-width">
+						<label class="form-label">备注</label>
+						<textarea class="form-textarea" id="formRemark" placeholder="补充说明…"></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn-secondary" id="modalCancel">取消</button>
+					<button class="btn-primary" id="modalSave">💾 保存</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Confirm Delete Dialog -->
+		<div class="confirm-overlay" id="confirmOverlay">
+			<div class="confirm-card">
+				<div class="confirm-icon">⚠️</div>
+				<div class="confirm-msg" id="confirmMsg">确定要删除此点位吗？此操作不可撤销。</div>
+				<div class="confirm-actions">
+					<button class="btn-secondary" id="confirmCancel">取消</button>
+					<button class="btn-danger" id="confirmOk">确认删除</button>
+				</div>
+			</div>
+		</div>
 
 		<!-- Libraries -->
 		<script src="ol/ol.js"></script>
@@ -919,8 +1626,8 @@
 					}),
 					visible: true,
 				})
-                boundaryLayer.setZIndex(10)
-                boundaryLayer.set('nopointermove', true) // Disable pointermove events for this layer
+				boundaryLayer.setZIndex(10)
+				boundaryLayer.set('nopointermove', true) // Disable pointermove events for this layer
 				// Insert boundary layer above basemaps but below point layers
 				sMap.map.getLayers().insertAt(2, boundaryLayer)
 				var boundaryVisible = true
@@ -1136,8 +1843,7 @@
 					pickPointerMoveKey = olMap.on('pointermove', function (evt) {
 						if (evt.dragging) return
 						var coord = evt.coordinate
-						pickCoordsEl.textContent =
-							'经度 ' + coord[0].toFixed(6) + '  ,  纬度 ' + coord[1].toFixed(6)
+						pickCoordsEl.textContent = '经度 ' + coord[0].toFixed(6) + '  ,  纬度 ' + coord[1].toFixed(6)
 					})
 
 					// Left-click to copy and exit
@@ -1145,11 +1851,14 @@
 						var coord = evt.coordinate
 						var text = coord[0].toFixed(6) + ', ' + coord[1].toFixed(6)
 						if (navigator.clipboard && navigator.clipboard.writeText) {
-							navigator.clipboard.writeText(text).then(function () {
-								showToast('✅ 已复制: ' + text)
-							}).catch(function () {
-								fallbackCopy(text)
-							})
+							navigator.clipboard
+								.writeText(text)
+								.then(function () {
+									showToast('✅ 已复制: ' + text)
+								})
+								.catch(function () {
+									fallbackCopy(text)
+								})
 						} else {
 							fallbackCopy(text)
 						}
@@ -1214,15 +1923,1323 @@
 					}
 				})
 
+
 				// ================================================================
-				//  Startup Log
+				//  Version Management — file-based, upload/download .js files
 				// ================================================================
 
+				/** Deep clone via JSON */
+				function deepClone(obj) {
+					return JSON.parse(JSON.stringify(obj))
+				}
+
+				/** The working data — all edit operations modify this directly.
+				 *  Initialized from point_data.js, may be overridden by versions.json */
+				var currentWorkingData = deepClone(pointData)
+
+				/** Version index loaded from web_data/versions.json */
+				var versionIndex = null
+				var currentVersionId = 1
+
+				/** Load versions.json and set up the version list */
+				function loadVersionIndex(callback) {
+					// Build version index from default + cached uploads
+					versionIndex = { currentId: 1, versions: [{ id: 1, file: 'point_data.js', label: '初始数据 (point_data.js)', timestamp: '-', points: countTotalPoints(pointData) }] }
+					// Merge cached uploaded versions from localStorage
+					try {
+						var cached = localStorage.getItem('yuxi_uploaded_index')
+						if (cached) {
+							var cIdx = JSON.parse(cached)
+							if (cIdx && cIdx.versions) {
+								for (var ci = 0; ci < cIdx.versions.length; ci++) {
+									var cv = cIdx.versions[ci]
+									var exists = false
+									for (var cj = 0; cj < versionIndex.versions.length; cj++) {
+										if (versionIndex.versions[cj].file === cv.file) { exists = true; break }
+									}
+									if (!exists) versionIndex.versions.push(cv)
+								}
+								currentVersionId = cIdx.currentId || 1
+								versionIndex.currentId = currentVersionId
+								// Load current version data from cache if it's an uploaded file
+								var dataText = localStorage.getItem('yuxi_uploaded_data_' + currentVersionId)
+								if (dataText) {
+									try {
+										var match = dataText.match(/=\s*(\{[\s\S]*\})\s*;?\s*$/)
+										if (match) {
+											currentWorkingData = JSON.parse(match[1])
+										} else {
+											var fn = new Function('return ' + dataText.replace(/^var\s+\w+\s*=\s*/, '').replace(/;\s*$/, ''))
+											currentWorkingData = fn()
+										}
+									} catch (e) {}
+								}
+							}
+						}
+					} catch (e) { console.warn('恢复上传版本缓存失败', e) }
+					if (callback) callback()
+				}
+
+				/** Find a version entry by id */
+				function findVersionById(id) {
+					if (!versionIndex || !versionIndex.versions) return null
+					for (var i = 0; i < versionIndex.versions.length; i++) {
+						if (versionIndex.versions[i].id === id) return versionIndex.versions[i]
+					}
+					return null
+				}
+
+				/** Fetch and parse a version data file */
+				function loadVersionDataFile(filename, callback) {
+					var xhr = new XMLHttpRequest()
+					xhr.open('GET', 'web_data/' + filename + '?t=' + Date.now(), true)
+					xhr.onload = function () {
+						if (xhr.status === 200) {
+							try {
+								var text = xhr.responseText
+								// Extract JSON object from "var pointData = {...}" or similar
+								var match = text.match(/=\s*(\{[\s\S]*\})\s*;?\s*$/)
+								if (match) {
+									var data = JSON.parse(match[1])
+									callback(data)
+									return
+								}
+								// Try evaluating as JavaScript
+								var fn = new Function('return ' + text.replace(/^var\s+\w+\s*=\s*/, '').replace(/;\s*$/, ''))
+								callback(fn())
+								return
+							} catch (e) {
+								console.error('版本文件解析失败: ' + filename, e)
+							}
+						}
+						callback(null)
+					}
+					xhr.onerror = function () { callback(null) }
+					xhr.send()
+				}
+
+				/** Get current data (working copy) */
+				function getCurrentData() {
+					return currentWorkingData
+				}
+
+				/** Get data at a specific version (by fetching the file if needed) */
+				function getDataAtVersionAsync(versionId, callback) {
+					if (versionId === 1) {
+						callback(deepClone(pointData))
+						return
+					}
+					var v = findVersionById(versionId)
+					if (!v) { callback(null); return }
+					loadVersionDataFile(v.file, function (data) {
+						callback(data || currentWorkingData)
+					})
+				}
+
+				/** Find the maximum point ID across data */
+				function getNextPointId() {
+					var maxId = 0
+					Object.keys(currentWorkingData).forEach(function (typeName) {
+						(currentWorkingData[typeName] || []).forEach(function (p) {
+							if (p.ID > maxId) maxId = p.ID
+						})
+					})
+					return maxId + 1
+				}
+
+				/** Count total points in a data object */
+				function countTotalPoints(data) {
+					var count = 0
+					Object.keys(data).forEach(function (t) { count += (data[t] || []).length })
+					return count
+				}
+
+				/** Generate file content for a version data file */
+				function generateVersionFileContent() {
+					return '// Monitoring device deployment points\n' +
+						'// CRS: WGS84 (EPSG:4326)\n' +
+						'// Auto-generated from edit session\n' +
+						'var pointData = ' + JSON.stringify(currentWorkingData, null, 2) + ';\n'
+				}
+
+				/** Trigger a file download in the browser */
+				function downloadFile(filename, content, mimeType) {
+					var blob = new Blob([content], { type: mimeType || 'application/javascript' })
+					var url = URL.createObjectURL(blob)
+					var a = document.createElement('a')
+					a.href = url
+					a.download = filename
+					document.body.appendChild(a)
+					a.click()
+					document.body.removeChild(a)
+					URL.revokeObjectURL(url)
+				}
+
+				/** Save: generate and download files, update version index in memory */
+				function saveToFiles(sessionName) {
+					if (!versionIndex) {
+						versionIndex = { currentId: 1, versions: [{ id: 1, file: 'point_data.js', label: '初始数据 (point_data.js)', timestamp: '-', points: countTotalPoints(pointData) }] }
+					}
+
+					var now = new Date()
+					var ts = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '_' +
+						String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0') + String(now.getSeconds()).padStart(2,'0')
+					var newFile = 'point_data_' + ts + '.js'
+					var timestamp = now.getFullYear() + '-' +
+						String(now.getMonth()+1).padStart(2,'0') + '-' +
+						String(now.getDate()).padStart(2,'0') + ' ' +
+						String(now.getHours()).padStart(2,'0') + ':' +
+						String(now.getMinutes()).padStart(2,'0')
+
+					var newId = versionIndex.versions.length + 1
+					versionIndex.versions.push({
+						id: newId,
+						file: newFile,
+						label: sessionName,
+						timestamp: timestamp,
+						points: countTotalPoints(currentWorkingData)
+					})
+					versionIndex.currentId = newId
+					currentVersionId = newId
+
+					// Download ONLY the data JS file
+					var dataContent = generateVersionFileContent()
+					downloadFile(newFile, dataContent)
+
+					// Cache uploaded version in localStorage so it persists
+					try {
+						localStorage.setItem('yuxi_uploaded_data_' + newId, dataContent)
+						localStorage.setItem('yuxi_uploaded_index', JSON.stringify(versionIndex))
+					} catch (e) {}
+
+					// Update UI
+					renderVersionHistory()
+					updateLayerListUI()
+
+					return newId
+				}
+
+				/** Upload a version .js file from local disk */
+				function uploadVersionFile(file) {
+					var reader = new FileReader()
+					reader.onload = function (e) {
+						try {
+							var text = e.target.result
+							var match = text.match(/=\s*(\{[\s\S]*\})\s*;?\s*$/)
+							var data
+							if (match) {
+								data = JSON.parse(match[1])
+							} else {
+								var fn = new Function('return ' + text.replace(/^var\s+\w+\s*=\s*/, '').replace(/;\s*$/, ''))
+								data = fn()
+							}
+							if (!data || typeof data !== 'object') {
+								showToastMsg('⚠ 文件格式无效', true)
+								return
+							}
+							if (!versionIndex) {
+								versionIndex = { currentId: 1, versions: [{ id: 1, file: 'point_data.js', label: '初始数据 (point_data.js)', timestamp: '-', points: countTotalPoints(pointData) }] }
+							}
+							var newId = versionIndex.versions.length + 1
+							var now = new Date()
+							var timestamp = now.getFullYear() + '-' +
+								String(now.getMonth()+1).padStart(2,'0') + '-' +
+								String(now.getDate()).padStart(2,'0') + ' ' +
+								String(now.getHours()).padStart(2,'0') + ':' +
+								String(now.getMinutes()).padStart(2,'0')
+							versionIndex.versions.push({
+								id: newId,
+								file: file.name,
+								label: file.name,
+								timestamp: timestamp,
+								points: countTotalPoints(data)
+							})
+							versionIndex.currentId = newId
+							currentVersionId = newId
+							currentWorkingData = data
+							// Cache in localStorage
+							try {
+								localStorage.setItem('yuxi_uploaded_data_' + newId, text)
+								localStorage.setItem('yuxi_uploaded_index', JSON.stringify(versionIndex))
+							} catch (e2) {}
+							refreshAllLayers()
+							renderVersionHistory()
+							updateLayerListUI()
+							showToastMsg('✅ 已加载：' + file.name + ' (V' + newId + ')')
+						} catch (e3) {
+							console.error('上传解析失败', e3)
+							showToastMsg('⚠ 解析失败：' + e3.message, true)
+						}
+					}
+					reader.readAsText(file)
+				}
+
+				/** Restore uploaded versions from localStorage on startup */
+
+				// ================================================================
+				//  Edit Mode State
+				// ================================================================
+
+				var editMode = false
+				var selectedPoint = null
+				var selectedFeature = null
+				var viewedVersionId = null
+				var highlightLayer = null
+				var editClickKey = null
+				var translateInteraction = null
+				var dragSubMode = false
+				var dragOriginalCoords = null
+				var editSessionName = ''
+				var editSessionSnapshot = null
+				var editSessionSaved = false
+
+				highlightLayer = new ol.layer.Vector({
+					source: new ol.source.Vector(),
+					style: new ol.style.Style({
+						image: new ol.style.Circle({
+							radius: 14,
+							fill: new ol.style.Fill({ color: 'rgba(251, 191, 36, 0.25)' }),
+							stroke: new ol.style.Stroke({ color: '#fbbf24', width: 3.5 }),
+						}),
+						zIndex: 9999,
+					}),
+					visible: true,
+				})
+				highlightLayer.setZIndex(9999)
+				sMap.map.addLayer(highlightLayer)
+
+				// Create a Translate interaction for dragging selected points
+				// It operates on the highlight layer's features
+				var translateFeatures = new ol.Collection()
+				translateInteraction = new ol.interaction.Translate({
+					features: translateFeatures,
+					layers: [highlightLayer],
+				})
+				translateInteraction.setActive(false)
+				sMap.map.addInteraction(translateInteraction)
+
+				// Track whether the feature actually moved during drag
+				var dragMoved = false
+
+				translateInteraction.on('translatestart', function (evt) {
+					dragMoved = false
+					var feat = evt.features.item(0)
+					var geom = feat.getGeometry()
+					var coords = geom.getCoordinates()
+					feat.set('_origLon', coords[0])
+					feat.set('_origLat', coords[1])
+					olMap.getViewport().style.cursor = 'grabbing'
+				})
+
+				translateInteraction.on('translating', function (evt) {
+					dragMoved = true
+					var feat = evt.features.item(0)
+					var geom = feat.getGeometry()
+					var coords = geom.getCoordinates()
+					// Update selected point coords and refresh the panel in real-time
+					if (selectedPoint) {
+						selectedPoint.point.Lon = coords[0]
+						selectedPoint.point.Lat = coords[1]
+						refreshSelectedInfoDisplay()
+					}
+				})
+
+				translateInteraction.on('translateend', function (evt) {
+					olMap.getViewport().style.cursor = 'crosshair'
+					if (!dragMoved || !selectedPoint) return
+
+					var feat = evt.features.item(0)
+					var geom = feat.getGeometry()
+					var coords = geom.getCoordinates()
+					var newLon = coords[0]
+					var newLat = coords[1]
+					var origLon = feat.get('_origLon')
+					var origLat = feat.get('_origLat')
+
+					// If in drag sub-mode, just update the point position in memory (no commit)
+					if (dragSubMode) {
+						if (Math.abs(newLon - origLon) < 0.000001 && Math.abs(newLat - origLat) < 0.000001) {
+							// Moved back to original — revert highlight
+							showHighlight(dragOriginalCoords[0], dragOriginalCoords[1])
+							selectedPoint.point.Lon = dragOriginalCoords[0]
+							selectedPoint.point.Lat = dragOriginalCoords[1]
+							refreshSelectedInfoDisplay()
+						} else {
+							// Update the in-memory point
+							selectedPoint.point.Lon = newLon
+							selectedPoint.point.Lat = newLat
+							refreshSelectedInfoDisplay()
+						}
+						return
+					}
+
+					// Legacy: if somehow dragged outside sub-mode, revert to original
+					showHighlight(origLon, origLat)
+					selectedPoint.point.Lon = origLon
+					selectedPoint.point.Lat = origLat
+					refreshSelectedInfoDisplay()
+				})
+
+				// ---- DOM refs ----
+				var editPanelEl = document.getElementById('editPanel')
+				var editPanelToggle = document.getElementById('editPanelToggle')
+				var selectedInfo = document.getElementById('selectedInfo')
+				var selectedDetails = document.getElementById('selectedDetails')
+				var btnEditPoint = document.getElementById('btnEditPoint')
+				var btnDeletePoint = document.getElementById('btnDeletePoint')
+				var addPointBtnEl = document.getElementById('addPointBtn')
+				var versionHistoryList = document.getElementById('versionHistoryList')
+				var versionCountLabel = document.getElementById('versionCountLabel')
+				var historyBanner = document.getElementById('historyBanner')
+				var bannerText = document.getElementById('bannerText')
+				var bannerRestoreBtn = document.getElementById('bannerRestoreBtn')
+
+				var modalOverlay = document.getElementById('modalOverlay')
+				var modalTitle = document.getElementById('modalTitle')
+				var modalClose = document.getElementById('modalClose')
+				var modalCancel = document.getElementById('modalCancel')
+				var modalSave = document.getElementById('modalSave')
+				var formType = document.getElementById('formType')
+				var formName = document.getElementById('formName')
+				var formDept = document.getElementById('formDept')
+				var formLocation = document.getElementById('formLocation')
+				var formLon = document.getElementById('formLon')
+				var formLat = document.getElementById('formLat')
+				var formQty = document.getElementById('formQty')
+				var formPower = document.getElementById('formPower')
+				var formComm = document.getElementById('formComm')
+				var formCond = document.getElementById('formCond')
+				var formRemark = document.getElementById('formRemark')
+
+				var confirmOverlay = document.getElementById('confirmOverlay')
+				var confirmMsgEl = document.getElementById('confirmMsg')
+				var confirmCancel = document.getElementById('confirmCancel')
+				var confirmOk = document.getElementById('confirmOk')
+
+				// Populate type dropdown
+				typeNames.forEach(function (tn) {
+					var opt = document.createElement('option')
+					opt.value = tn
+					opt.textContent = tn
+					formType.appendChild(opt)
+				})
+
+				// ================================================================
+				//  Enter / Exit Edit Mode
+				// ================================================================
+
+			function enterEditMode() {
+				if (pickActive) exitPickMode()
+
+				// Auto-generate session name from timestamp
+				var now = new Date()
+				editSessionName =
+					now.getFullYear() + "-" +
+					String(now.getMonth() + 1).padStart(2, "0") + "-" +
+					String(now.getDate()).padStart(2, "0") + " " +
+					String(now.getHours()).padStart(2, "0") + ":" +
+					String(now.getMinutes()).padStart(2, "0")
+				editSessionSnapshot = deepClone(currentWorkingData)
+				editSessionSaved = false
+
+				editMode = true
+				btnStartEdit.textContent = "✏️ 结束编辑"
+				btnStartEdit.classList.add("active")
+				olMap.getViewport().style.cursor = "crosshair"
+
+				// Show edit controls
+				document.getElementById("addPointBtn").style.display = "block"
+
+				editClickKey = olMap.on("click", onEditMapClick)
+
+				updateEditPanelHeader()
+				renderVersionHistory()
+			}
+
+			function exitEditMode(forceDiscard) {
+				// Check for unsaved changes
+				if (!forceDiscard && !editSessionSaved && editSessionSnapshot) {
+					var hasChanges = JSON.stringify(currentWorkingData) !== JSON.stringify(editSessionSnapshot)
+					if (hasChanges) {
+						var choice = confirm("有未保存的编辑内容。\\n\\n\"确定\" = 保存并退出\\n\"取消\" = 继续编辑")
+						if (choice) {
+							saveEditSession()
+						} else {
+							return
+						}
+					}
+				}
+
+				editMode = false
+				btnStartEdit.textContent = "✏️ 编辑"
+				btnStartEdit.classList.remove("active")
+				olMap.getViewport().style.cursor = ""
+				clearSelection()
+				exitDragSubMode()
+
+				// Hide edit controls
+				document.getElementById("addPointBtn").style.display = "none"
+				selectedInfo.classList.remove("visible")
+
+				if (editClickKey !== null) {
+					ol.Observable.unByKey(editClickKey)
+					editClickKey = null
+				}
+
+				if (viewedVersionId !== null) {
+					restoreCurrentVersion()
+				}
+
+				editSessionName = ""
+				editSessionSnapshot = null
+				editSessionSaved = false
+				updateEditPanelHeader()
+			}
+
+				function saveEditSession() {
+					if (!editSessionName || editSessionSaved) return
+					var newId = saveToFiles(editSessionName)
+					var newFile = versionIndex ? versionIndex.versions[versionIndex.versions.length-1].file : 'unknown.js'
+					editSessionSaved = true
+					editSessionSnapshot = deepClone(currentWorkingData)
+					refreshAllLayers()
+					updateEditPanelHeader()
+					showToastMsg("✅ 已保存：" + editSessionName + " —— 请将下载的 " + newFile + " 放入 web_data/ 文件夹")
+				}
+
+				function discardEditSession() {
+					if (!editSessionSnapshot) return
+					currentWorkingData = deepClone(editSessionSnapshot)
+					editSessionSaved = false
+					refreshAllLayers()
+					clearSelection()
+					renderVersionHistory()
+					updateLayerListUI()
+					updateEditPanelHeader()
+					showToastMsg('已放弃本次编辑内容')
+				}
+
+				function updateEditPanelHeader() {
+					var headerSpan = editPanelToggle.querySelector('span:first-child')
+					if (!headerSpan) return
+					if (editMode && editSessionName) {
+						headerSpan.innerHTML =
+							'✏️ 编辑：' +
+							editSessionName +
+							(editSessionSaved ? ' <span style="color:var(--success);font-size:10px">已保存</span>' : ' <span style="color:var(--warning);font-size:10px">未保存</span>')
+						btnSaveSession.style.display = editSessionSaved ? 'none' : 'inline-block'
+						btnDiscardSession.style.display = 'inline-block'
+					} else {
+						headerSpan.textContent = '✏️ 编辑模式'
+						btnSaveSession.style.display = 'none'
+						btnDiscardSession.style.display = 'none'
+					}
+				}
+
+				// ---- Drag Sub-Mode ----
+				function enterDragSubMode() {
+					if (!selectedPoint || viewedVersionId !== null) return
+					dragSubMode = true
+					editClickKey && ol.Observable.unByKey(editClickKey)
+					editClickKey = null
+					dragOriginalCoords = [selectedPoint.point.Lon, selectedPoint.point.Lat]
+					document.getElementById('dragBar').classList.add('visible')
+					// Disable edit/delete buttons during drag
+					btnEditPoint.disabled = true
+					btnDeletePoint.disabled = true
+					var moveBtn = document.getElementById('btnMovePoint')
+					if (moveBtn) moveBtn.textContent = '📍 拖动中…'
+				}
+
+				function exitDragSubMode() {
+					dragSubMode = false
+					dragOriginalCoords = null
+					document.getElementById('dragBar').classList.remove('visible')
+					btnEditPoint.disabled = false
+					btnDeletePoint.disabled = false
+					var moveBtn = document.getElementById('btnMovePoint')
+					if (moveBtn) moveBtn.textContent = '📍 调整位置'
+					// Re-bind edit click
+					if (editMode) {
+						editClickKey = olMap.on('click', onEditMapClick)
+					}
+				}
+
+				function confirmDragPosition() {
+					if (!selectedPoint) return
+					var point = selectedPoint.point
+					var typeName = selectedPoint.typeName
+					// Update working data with new position
+					var arr = currentWorkingData[typeName]
+					if (arr) {
+						for (var di = 0; di < arr.length; di++) {
+							if (arr[di].ID === point.ID) {
+								arr[di].Lon = point.Lon
+								arr[di].Lat = point.Lat
+								break
+							}
+						}
+					}
+					refreshLayerByType(typeName)
+					selectPoint(typeName, point, null)
+					editSessionSaved = false
+					updateEditPanelHeader()
+					showToastMsg('📍 位置已更新（尚未保存到版本）')
+					exitDragSubMode()
+				}
+
+				function cancelDragPosition() {
+					if (!selectedPoint || !dragOriginalCoords) return
+					// Restore original position
+					selectedPoint.point.Lon = dragOriginalCoords[0]
+					selectedPoint.point.Lat = dragOriginalCoords[1]
+					refreshLayerByType(selectedPoint.typeName)
+					selectPoint(selectedPoint.typeName, selectedPoint.point, null)
+					exitDragSubMode()
+				}
+
+				// Drag bar buttons
+				document.getElementById('dragConfirm').addEventListener('click', confirmDragPosition)
+				document.getElementById('dragCancel').addEventListener('click', cancelDragPosition)
+
+			// Upload version button
+			var btnUploadVersion = document.getElementById('btnUploadVersion')
+			var uploadVersionInput = document.getElementById('uploadVersionInput')
+			if (btnUploadVersion && uploadVersionInput) {
+				btnUploadVersion.addEventListener('click', function () {
+					uploadVersionInput.click()
+				})
+				uploadVersionInput.addEventListener('change', function () {
+					if (this.files && this.files[0]) {
+						uploadVersionFile(this.files[0])
+						this.value = ''
+					}
+				})
+			}
+
+			btnStartEdit.addEventListener("click", function (e) {
+				e.stopPropagation()
+				if (editMode) {
+					exitEditMode(false)
+				} else {
+					enterEditMode()
+				}
+			})
+
+				editPanelToggle.addEventListener('click', function () {
+					editPanelEl.classList.toggle('collapsed')
+				})
+
+				btnSaveSession.addEventListener('click', function (e) {
+					e.stopPropagation()
+					saveEditSession()
+				})
+
+				btnDiscardSession.addEventListener('click', function (e) {
+					e.stopPropagation()
+					if (confirm('确定要放弃本次编辑的所有内容吗？此操作不可恢复。')) {
+						discardEditSession()
+					}
+				})
+
+				// ================================================================
+				//  Map Click Handler (Edit Mode)
+				// ================================================================
+
+				function onEditMapClick(evt) {
+					if (viewedVersionId !== null) {
+						showToastMsg('⚠ 正在查看历史版本，请先点击"返回当前版本"', true)
+						return
+					}
+
+					var feature = olMap.forEachFeatureAtPixel(evt.pixel, function (feat, layer) {
+						if (layer === highlightLayer) return null
+						if (layer === boundaryLayer) return null
+						if (feat.get('data')) return feat
+						return null
+					})
+
+					if (feature) {
+						var dataStr = feature.get('data')
+						var props
+						try {
+							props = JSON.parse(dataStr)
+						} catch (e) {
+							props = {}
+						}
+						selectPoint(props.Type, props, feature)
+					} else {
+						clearSelection()
+						openAddForm(evt.coordinate[0], evt.coordinate[1])
+					}
+				}
+
+				// ================================================================
+				//  Point Selection
+				// ================================================================
+
+				function selectPoint(typeName, point, feature) {
+					selectedPoint = { typeName: typeName, point: point }
+					selectedFeature = feature
+					selectedInfo.classList.add('visible')
+
+					var colors = TYPE_COLORS[typeName]
+					var dotColor = colors ? colors.fill : '#888'
+					var html = ''
+					html +=
+						"<div class='sel-row'><span class='sel-key'>类型</span><span class='sel-val'>" +
+						"<span style='display:inline-block;width:8px;height:8px;border-radius:50%;background:" +
+						dotColor +
+						";margin-right:4px;vertical-align:middle'></span>" +
+						typeName +
+						' &nbsp;·&nbsp; #' +
+						point.ID +
+						'</span></div>'
+					html += "<div class='sel-row'><span class='sel-key'>名称</span><span class='sel-val'>" + (point.Name || '') + '</span></div>'
+					if (point.Dept) html += "<div class='sel-row'><span class='sel-key'>管理所</span><span class='sel-val'>" + point.Dept + '</span></div>'
+					if (point.Location) html += "<div class='sel-row'><span class='sel-key'>位置</span><span class='sel-val'>" + point.Location + '</span></div>'
+					html += "<div class='sel-row'><span class='sel-key'>坐标</span><span class='sel-val'>" + point.Lon.toFixed(5) + ', ' + point.Lat.toFixed(5) + '</span></div>'
+					if (point.Power) html += "<div class='sel-row'><span class='sel-key'>供电</span><span class='sel-val'>" + point.Power + '</span></div>'
+					if (point.Comm) html += "<div class='sel-row'><span class='sel-key'>通讯</span><span class='sel-val'>" + point.Comm + '</span></div>'
+					if (point.Remark) html += "<div class='sel-row'><span class='sel-key'>备注</span><span class='sel-val'>" + point.Remark + '</span></div>'
+
+					selectedDetails.innerHTML = html
+					showHighlight(point.Lon, point.Lat)
+
+					// Activate drag on the highlight feature
+					if (translateInteraction) {
+						translateFeatures.clear()
+						var hf = highlightLayer.getSource().getFeatures()
+						if (hf.length > 0) {
+							translateFeatures.push(hf[0])
+							translateInteraction.setActive(true)
+						}
+					}
+				}
+
+				function clearSelection() {
+					selectedPoint = null
+					selectedFeature = null
+					selectedInfo.classList.remove('visible')
+					selectedDetails.innerHTML = ''
+					// Deactivate drag
+					if (translateInteraction) {
+						translateInteraction.setActive(false)
+						translateFeatures.clear()
+					}
+					hideHighlight()
+				}
+
+				// ================================================================
+				//  Highlight Layer
+				// ================================================================
+
+				function showHighlight(lon, lat) {
+					hideHighlight()
+					var feat = new ol.Feature({
+						geometry: new ol.geom.Point([lon, lat]),
+					})
+					highlightLayer.getSource().addFeature(feat)
+				}
+
+				function hideHighlight() {
+					highlightLayer.getSource().clear()
+				}
+
+				/** Refresh only the coordinate line in the selected-info panel during drag */
+				function refreshSelectedInfoDisplay() {
+					if (!selectedPoint) return
+					var p = selectedPoint.point
+					var rows = selectedDetails.querySelectorAll('.sel-row')
+					for (var i = 0; i < rows.length; i++) {
+						var keyEl = rows[i].querySelector('.sel-key')
+						if (keyEl && keyEl.textContent === '坐标') {
+							var valEl = rows[i].querySelector('.sel-val')
+							if (valEl) {
+								valEl.textContent = p.Lon.toFixed(5) + ', ' + p.Lat.toFixed(5)
+							}
+							break
+						}
+					}
+				}
+
+				// ================================================================
+				//  Layer Refresh
+				// ================================================================
+
+				function refreshLayerByType(typeName) {
+					var oldLayer = allLayers[typeName]
+					var wasVisible = oldLayer ? oldLayer.getVisible() : true
+
+					if (oldLayer) {
+						sMap.removeLayer(oldLayer)
+					}
+
+					var currentData = getCurrentData()
+					var points = currentData[typeName] || []
+
+					var newLayer = new sol.SimplePointFeatureLayer({
+						id: 'lyr_' + typeName,
+						data: points,
+						dataType: sol.global.featureTypes.point,
+						sourceType: 'json',
+						dataLngName: 'Lon',
+						dataLatName: 'Lat',
+						styleFn: makePointStyle,
+						declutter: 'separate',
+						renderBuffer: 30,
+						visible: wasVisible,
+					})
+
+					sMap.addLayer(newLayer)
+					allLayers[typeName] = newLayer
+					layerVisible[typeName] = wasVisible
+
+					var item = layerListEl.querySelector("[data-type='" + typeName + "']")
+					if (item) {
+						if (wasVisible) item.classList.remove('off')
+						else item.classList.add('off')
+					}
+				}
+
+				function refreshAllLayers() {
+					typeNames.forEach(function (tn) {
+						refreshLayerByType(tn)
+					})
+				}
+
+				// ================================================================
+				//  Modal Form — Add / Edit
+				// ================================================================
+
+				var editingPointId = null
+				var editingPointType = null
+
+				function clearFormErrors() {
+					document.querySelectorAll('.form-error').forEach(function (el) {
+						el.classList.remove('visible')
+					})
+				}
+
+				function resetForm() {
+					formType.value = typeNames[0]
+					formName.value = ''
+					formDept.value = ''
+					formLocation.value = ''
+					formLon.value = ''
+					formLat.value = ''
+					formQty.value = '1'
+					formPower.value = ''
+					formComm.value = ''
+					formCond.value = ''
+					formRemark.value = ''
+					clearFormErrors()
+				}
+
+				function openAddForm(lon, lat) {
+					if (viewedVersionId !== null) {
+						showToastMsg('⚠ 请先返回当前版本', true)
+						return
+					}
+					editingPointId = null
+					editingPointType = null
+					resetForm()
+					modalTitle.textContent = '➕ 添加点位'
+					formLon.value = lon.toFixed(6)
+					formLat.value = lat.toFixed(6)
+					modalOverlay.classList.add('visible')
+					setTimeout(function () {
+						formName.focus()
+					}, 150)
+				}
+
+				function openEditForm(typeName, point) {
+					if (viewedVersionId !== null) {
+						showToastMsg('⚠ 请先返回当前版本', true)
+						return
+					}
+					editingPointId = point.ID
+					editingPointType = typeName
+					resetForm()
+					modalTitle.textContent = '✎ 编辑点位 #' + point.ID
+					formType.value = typeName
+					formName.value = point.Name || ''
+					formDept.value = point.Dept || ''
+					formLocation.value = point.Location || ''
+					formLon.value = point.Lon
+					formLat.value = point.Lat
+					formQty.value = point.Qty != null ? point.Qty : 1
+					formPower.value = point.Power || ''
+					formComm.value = point.Comm || ''
+					formCond.value = point.Cond || ''
+					formRemark.value = point.Remark || ''
+					modalOverlay.classList.add('visible')
+					setTimeout(function () {
+						formName.focus()
+					}, 150)
+				}
+
+				function closeModal() {
+					modalOverlay.classList.remove('visible')
+					editingPointId = null
+					editingPointType = null
+				}
+
+				modalClose.addEventListener('click', closeModal)
+				modalCancel.addEventListener('click', closeModal)
+
+				modalOverlay.addEventListener('click', function (e) {
+					if (e.target === modalOverlay) closeModal()
+				})
+
+				document.addEventListener('keydown', function (e) {
+					if (e.key === 'Escape' && modalOverlay.classList.contains('visible')) {
+						closeModal()
+					}
+				})
+
+				function validateForm() {
+					clearFormErrors()
+					var valid = true
+
+					if (!formName.value.trim()) {
+						document.getElementById('errName').classList.add('visible')
+						valid = false
+					}
+					var lon = parseFloat(formLon.value)
+					if (isNaN(lon) || lon < -180 || lon > 180) {
+						document.getElementById('errLon').classList.add('visible')
+						valid = false
+					}
+					var lat = parseFloat(formLat.value)
+					if (isNaN(lat) || lat < -90 || lat > 90) {
+						document.getElementById('errLat').classList.add('visible')
+						valid = false
+					}
+
+					return valid
+				}
+
+				function collectFormPoint() {
+					return {
+						ID: editingPointId || getNextPointId(),
+						Type: formType.value,
+						Name: formName.value.trim(),
+						Dept: formDept.value.trim(),
+						Location: formLocation.value.trim(),
+						Lon: parseFloat(formLon.value),
+						Lat: parseFloat(formLat.value),
+						Qty: parseInt(formQty.value) || 1,
+						Power: formPower.value.trim(),
+						Comm: formComm.value.trim(),
+						Cond: formCond.value.trim(),
+						Remark: formRemark.value.trim(),
+					}
+				}
+
+				modalSave.addEventListener('click', function () {
+					if (!validateForm()) return
+
+					var point = collectFormPoint()
+
+					if (editingPointId != null) {
+						// Update working data
+						var upArr = currentWorkingData[editingPointType]
+						if (upArr) {
+							for (var ui = 0; ui < upArr.length; ui++) {
+								if (upArr[ui].ID === editingPointId) {
+									Object.keys(point).forEach(function (k) {
+										upArr[ui][k] = point[k]
+									})
+									break
+								}
+							}
+						}
+						// If type changed, move to new type array
+						if (editingPointType !== point.Type) {
+							if (!currentWorkingData[point.Type]) currentWorkingData[point.Type] = []
+							currentWorkingData[point.Type].push(point)
+							// Remove from old type
+							var oldArr = currentWorkingData[editingPointType]
+							if (oldArr) {
+								for (var oi = 0; oi < oldArr.length; oi++) {
+									if (oldArr[oi].ID === editingPointId) {
+										oldArr.splice(oi, 1)
+										break
+									}
+								}
+							}
+						}
+					var desc = "修改点位 #" + editingPointId + " (" + point.Name + ")"
+					// (update saved on session save)
+						refreshLayerByType(editingPointType)
+						if (editingPointType !== point.Type) {
+							refreshLayerByType(point.Type)
+						}
+						selectPoint(point.Type, point, null)
+						showToastMsg('✅ 点位已更新（尚未保存到版本）')
+					} else {
+						// Add to working data
+						if (!currentWorkingData[point.Type]) currentWorkingData[point.Type] = []
+						currentWorkingData[point.Type].push(point)
+					// (new point saved on session save)
+						if (typeNames.indexOf(point.Type) < 0) {
+							typeNames.push(point.Type)
+							typeNames.sort()
+							updateLayerListUI()
+						}
+						refreshLayerByType(point.Type)
+						selectPoint(point.Type, point, null)
+						showToastMsg('✅ 点位已添加（尚未保存到版本）')
+					}
+
+					closeModal()
+					editSessionSaved = false
+					updateEditPanelHeader()
+					renderVersionHistory()
+					updateLayerListUI()
+				})
+
+				btnEditPoint.addEventListener('click', function () {
+					if (!selectedPoint) return
+					openEditForm(selectedPoint.typeName, selectedPoint.point)
+				})
+
+				btnDeletePoint.addEventListener('click', function () {
+					if (!selectedPoint) return
+					confirmMsgEl.textContent = '确定要删除点位 #' + selectedPoint.point.ID + '（' + selectedPoint.point.Name + '）吗？此操作不可撤销。'
+					confirmOverlay.classList.add('visible')
+				})
+
+				// "调整位置" button — enters drag sub-mode
+				var btnMovePoint = document.getElementById('btnMovePoint')
+				if (btnMovePoint) {
+					btnMovePoint.addEventListener('click', function () {
+						if (!selectedPoint || dragSubMode) return
+						if (viewedVersionId !== null) {
+							showToastMsg('⚠ 请先返回当前版本', true)
+							return
+						}
+						enterDragSubMode()
+					})
+				}
+
+				addPointBtnEl.addEventListener('click', function () {
+					if (viewedVersionId !== null) {
+						showToastMsg('⚠ 请先返回当前版本', true)
+						return
+					}
+					clearSelection()
+					openAddForm(centerLon, centerLat)
+				})
+
+				// ================================================================
+				//  Confirm Delete Dialog
+				// ================================================================
+
+				confirmCancel.addEventListener('click', function () {
+					confirmOverlay.classList.remove('visible')
+				})
+
+				confirmOverlay.addEventListener('click', function (e) {
+					if (e.target === confirmOverlay) confirmOverlay.classList.remove('visible')
+				})
+
+				confirmOk.addEventListener('click', function () {
+					if (!selectedPoint) return
+					var typeName = selectedPoint.typeName
+					var point = selectedPoint.point
+					// Remove from working data
+					var delArr = currentWorkingData[typeName]
+					if (delArr) {
+						for (var di = 0; di < delArr.length; di++) {
+							if (delArr[di].ID === point.ID) {
+								delArr.splice(di, 1)
+								break
+							}
+						}
+					}
+				var desc = "删除点位 #" + point.ID + " (" + point.Name + ")"
+				// (deletion saved on session save)
+					confirmOverlay.classList.remove('visible')
+					clearSelection()
+					refreshLayerByType(typeName)
+					editSessionSaved = false
+					updateEditPanelHeader()
+					renderVersionHistory()
+					updateLayerListUI()
+					showToastMsg('✅ 点位已删除（尚未保存到版本）')
+				})
+
+				// ================================================================
+				//  Version History UI
+				// ================================================================
+
+			function renderVersionHistory() {
+				if (!versionIndex || !versionIndex.versions) {
+					versionHistoryList.innerHTML = '<div class="version-empty">暂无版本记录<br><small style="color:var(--text-muted)">上传 .js 文件或编辑保存来创建新版本</small></div>'
+					return
+				}
+				var versions = versionIndex.versions
+				versionCountLabel.textContent = versions.length + ' 个版本'
+
+				var html = ''
+				for (var i = versions.length - 1; i >= 0; i--) {
+					var v = versions[i]
+					var isCurrent = v.id === currentVersionId && viewedVersionId === null
+					var isViewing = viewedVersionId === v.id
+					var cls = 'version-item'
+					if (isCurrent) cls += ' active'
+					if (isViewing) cls += ' historical'
+
+					html += "<div class='" + cls + "' data-ver='" + v.id + "' data-file='" + v.file + "'>"
+					html += "<div class='ver-header'><span class='ver-id'>V" + v.id + '</span>'
+					html += "<span class='ver-time'>" + (v.timestamp || '') + '</span></div>'
+					html += "<div class='ver-desc'>" + (v.label || '') + '</div>'
+					html += "<span style='font-size:10px;color:var(--text-muted)'>共 " + (v.points || '?') + ' 个点位 &nbsp;|&nbsp; ' + v.file + '</span>'
+
+					html += "<div class='ver-actions' style='margin-top:6px'>"
+
+					if (isViewing) {
+						html += "<span style='font-size:10px;color:var(--warning);display:inline-block;padding:3px 10px;border:1px solid rgba(251,191,36,0.3);border-radius:10px'>👁 正在查看</span>"
+					} else if (isCurrent) {
+						html += "<span style='font-size:10px;color:var(--accent);display:inline-block;padding:3px 10px'>● 当前版本</span>"
+					}
+
+					if (!isViewing && !isCurrent) {
+						html += "<button class='btn-secondary btn-sm ver-view-btn'>👁 查看</button>"
+						html += "<button class='btn-secondary btn-sm ver-set-current-btn' style='margin-left:4px'>★ 设为当前</button>"
+						html += "<button class='btn-danger btn-sm ver-delete-btn' style='margin-left:4px'>✕ 删除</button>"
+					}
+
+					html += '</div></div>'
+				}
+
+				versionHistoryList.innerHTML = html
+
+				// Bind view buttons
+				versionHistoryList.querySelectorAll('.ver-view-btn').forEach(function (btn) {
+					btn.addEventListener('click', function (e) {
+						e.stopPropagation()
+						var verId = parseInt(this.closest('.version-item').getAttribute('data-ver'))
+						viewHistoricalVersion(verId)
+					})
+				})
+
+				// Bind set-current buttons
+				versionHistoryList.querySelectorAll('.ver-set-current-btn').forEach(function (btn) {
+					btn.addEventListener('click', function (e) {
+						e.stopPropagation()
+						var verId = parseInt(this.closest('.version-item').getAttribute('data-ver'))
+						if (confirm('确定将 V' + verId + ' 设为当前版本吗？')) {
+							if (!versionIndex) return
+							versionIndex.currentId = verId
+							currentVersionId = verId
+							// Save to localStorage cache
+							try { localStorage.setItem('yuxi_uploaded_index', JSON.stringify(versionIndex)) } catch (e) {}
+							viewHistoricalVersion(verId)
+							restoreCurrentVersion()
+							showToastMsg('✅ 已将 V' + verId + ' 设为当前版本')
+						}
+					})
+				})
+				// Bind delete buttons
+				versionHistoryList.querySelectorAll('.ver-delete-btn').forEach(function (btn) {
+					btn.addEventListener('click', function (e) {
+						e.stopPropagation()
+						var verId = parseInt(this.closest('.version-item').getAttribute('data-ver'))
+						if (verId === 1) { showToastMsg('初始数据不可删除', true); return }
+						if (verId === currentVersionId) { showToastMsg('不能删除当前版本', true); return }
+						var v = findVersionById(verId)
+						if (!v) return
+						if (confirm('确定要删除版本 V' + verId + '（' + (v.label || v.file) + '）吗？此操作不可恢复。')) {
+							// Remove from index
+							versionIndex.versions = versionIndex.versions.filter(function (x) { return x.id !== verId })
+							// Remove from localStorage cache
+							try {
+								localStorage.removeItem('yuxi_uploaded_data_' + verId)
+								localStorage.setItem('yuxi_uploaded_index', JSON.stringify(versionIndex))
+							} catch (e) {}
+							renderVersionHistory()
+							showToastMsg('已删除版本 V' + verId)
+						}
+					})
+				})
+
+			}
+			function viewHistoricalVersion(versionId) {
+				viewedVersionId = versionId
+				clearSelection()
+
+				// V1 = default point_data.js
+				if (versionId === 1) {
+					currentWorkingData = deepClone(pointData)
+					showHistoryOnMap(currentWorkingData, versionId)
+					return
+				}
+
+				// Try localStorage cache for uploaded versions
+				var dataText = localStorage.getItem('yuxi_uploaded_data_' + versionId)
+				if (dataText) {
+					try {
+						var match = dataText.match(/=\s*(\{[\s\S]*\})\s*;?\s*$/)
+						if (match) {
+							currentWorkingData = JSON.parse(match[1])
+							showHistoryOnMap(currentWorkingData, versionId)
+							return
+						}
+					} catch (e) {}
+				}
+
+				// Fallback: try fetching from web_data/ folder
+				var v = findVersionById(versionId)
+				if (v && v.file && v.file !== 'point_data.js') {
+					loadVersionDataFile(v.file, function (data) {
+						if (data) {
+							currentWorkingData = data
+							showHistoryOnMap(data, versionId)
+						} else {
+							showToastMsg('无法加载版本 V' + versionId, true)
+						}
+					})
+					return
+				}
+
+				showToastMsg('未找到版本 V' + versionId + ' 的数据', true)
+			}
+
+			function showHistoryOnMap(data, versionId) {
+				var histTypes = Object.keys(data).sort()
+				histTypes.forEach(function (tn) {
+					if (typeNames.indexOf(tn) < 0) typeNames.push(tn)
+				})
+				typeNames.sort()
+
+				typeNames.forEach(function (tn) {
+					var oldLayer = allLayers[tn]
+					var wasVisible = oldLayer ? oldLayer.getVisible() : true
+					if (oldLayer) sMap.removeLayer(oldLayer)
+
+					var points = data[tn] || []
+					var newLayer = new sol.SimplePointFeatureLayer({
+						id: 'lyr_' + tn,
+						data: points,
+						dataType: sol.global.featureTypes.point,
+						sourceType: 'json',
+						dataLngName: 'Lon',
+						dataLatName: 'Lat',
+						styleFn: makePointStyle,
+						declutter: 'separate',
+						renderBuffer: 30,
+						visible: wasVisible,
+					})
+					sMap.addLayer(newLayer)
+					allLayers[tn] = newLayer
+					layerVisible[tn] = wasVisible
+				})
+
+				var label = 'V' + versionId
+				var v2 = findVersionById(versionId)
+				if (v2) label = 'V' + versionId + ' · ' + (v2.label || '')
+				bannerText.textContent = '正在查看历史版本：' + label + '（只读）'
+				historyBanner.classList.add('visible')
+				renderVersionHistory()
+				updateLayerListUI()
+			}
+			function restoreCurrentVersion() {
+				viewedVersionId = null
+				var cv = findVersionById(currentVersionId)
+				if (cv && cv.file !== 'point_data.js') {
+					loadVersionDataFile(cv.file, function (data) {
+						if (data) currentWorkingData = data
+						refreshAllLayers()
+						clearSelection()
+						historyBanner.classList.remove('visible')
+						renderVersionHistory()
+						updateLayerListUI()
+					})
+				} else {
+					currentWorkingData = deepClone(pointData)
+					refreshAllLayers()
+					clearSelection()
+					historyBanner.classList.remove('visible')
+					renderVersionHistory()
+					updateLayerListUI()
+				}
+			}
+
+			bannerRestoreBtn.addEventListener('click', restoreCurrentVersion)
+
+				// ================================================================
+				//  Layer List UI Update (refresh counts and items)
+				// ================================================================
+
+				function updateLayerListUI() {
+					var currentData = getCurrentData()
+					var items = layerListEl.querySelectorAll('.layer-item')
+					items.forEach(function (item) {
+						var typeName = item.getAttribute('data-type')
+						if (!typeName) return
+						var count = (currentData[typeName] || []).length
+						var countEl = item.querySelector('.count')
+						if (countEl) countEl.textContent = count
+					})
+					var totalCount = 0
+					var typeCount = 0
+					Object.keys(currentData).forEach(function (tn) {
+						var c = (currentData[tn] || []).length
+						if (c > 0) typeCount++
+						totalCount += c
+					})
+					var titleSub = document.querySelector('.title-bar .sub')
+					if (titleSub) {
+						titleSub.textContent = 'WGS84 坐标系  |  ' + typeCount + ' 种设备类型  |  共 ' + totalCount + ' 个点位'
+					}
+				}
+
+				// ================================================================
+				//  Shared Toast Helper
+				// ================================================================
+
+				function showToastMsg(msg, isError) {
+					toastEl.textContent = msg
+					toastEl.classList.add('show')
+					if (isError) {
+						toastEl.classList.add('error')
+					} else {
+						toastEl.classList.remove('error')
+					}
+					clearTimeout(toastTimer)
+					toastTimer = setTimeout(function () {
+						toastEl.classList.remove('show')
+						toastEl.classList.remove('error')
+					}, 1800)
+				}
+
+				// ================================================================
+			//  Startup — load version index, then initialize
+			// ================================================================
+
+			loadVersionIndex(function () {
+				// If a non-default version was loaded, rebuild layers
+				var cv = findVersionById(currentVersionId)
+				if (cv && cv.file !== 'point_data.js') {
+					refreshAllLayers()
+					updateLayerListUI()
+				}
+
 				console.log('%c玉溪智慧水务点位图 %c初始化完成', 'font-size:16px;font-weight:bold;', 'font-size:12px;')
-				console.log('  设备类型: ' + typeNames.length + ' | 总点位: ' + allLons.length)
-				console.log('  地图中心: [' + centerLon.toFixed(4) + ', ' + centerLat.toFixed(4) + ']')
+				var initTotal = countTotalPoints(currentWorkingData)
+				var initTypes = 0
+				Object.keys(currentWorkingData).forEach(function (tn) {
+					if ((currentWorkingData[tn] || []).length > 0) initTypes++
+				})
+				var verCount = versionIndex ? versionIndex.versions.length : 1
+				console.log('  设备类型: ' + initTypes + ' | 总点位: ' + initTotal)
+				console.log('  版本数量: ' + verCount + ' | 当前版本: V' + currentVersionId + ' | 地图中心: [' + centerLon.toFixed(4) + ', ' + centerLat.toFixed(4) + ']')
 				console.log('  底图: 天地图 (SOL addTdtLayer) | 坐标系: EPSG:4326')
-				console.log('  点样式: SOL styleFn | 气泡: mouseMoveCall')
+				console.log('  点样式: SOL styleFn | 气泡: mouseMoveCall | 编辑模式: 文件版本管理')
+			})
 			})()
 		</script>
 	</body>

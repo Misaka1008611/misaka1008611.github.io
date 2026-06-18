@@ -1,0 +1,12 @@
+{
+  "currentId": 1,
+  "versions": [
+    {
+      "id": 1,
+      "file": "point_data.js",
+      "label": "初始版本",
+      "timestamp": "2024-01-01",
+      "points": 110
+    }
+  ]
+}
